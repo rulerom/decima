@@ -28,6 +28,8 @@
 | **locked** | 0/1 | Фьюз защёлкнут (latched) |
 | **drive_vec[8]** | u8[8] | Выходные значения (0..15) |
 
+> **Примечание:** Decay применяется всегда (если decay16 > 0), даже на locked тайлах.
+
 ---
 
 ## 🔄 ACTIVE Closure (Граф Активации)
@@ -84,6 +86,8 @@ for i in 0..7:
 
 ### Decay-to-Zero + Fuse-by-Range
 
+**Decay применяется всегда** (если decay16 > 0), даже на locked тайлах.
+
 Если `locked_before == 0`:
 
 ```python
@@ -112,20 +116,44 @@ entered_by_decay = (decay16 > 0) AND (in_range == true) AND (in_range_before_dec
 locked_after = (BAKE_APPLIED == 1) AND in_range AND (has_signal OR entered_by_decay)
 ```
 
+Если `locked_before == 1`:
+
+```python
+locked_after := 1
+# Веса не применяются (passthrough)
+
+# Decay применяется всегда (если decay16 > 0)
+if decay16 > 0:
+  if thr_cur16 > 0:
+    thr_cur16 = max(thr_cur16 - decay16, 0)
+  elif thr_cur16 < 0:
+    thr_cur16 = min(thr_cur16 + decay16, 0)
+```
+
 ### Locked Passthrough
 
 Если `locked_after == 1`, тайл действует как «медный мост»:
 
 - Матрица W **не применяется**
 - `drive_vec[i] = in16[i]` для всех i=0..7 (passthrough)
+- **Decay применяется** (если decay16 > 0, тянет thr_cur16 к 0)
 
 ### Latched State
 
 Если `locked_before == 1`:
 
 - `locked_after := 1`
-- `thr_cur16` не меняется
-- Веса/decay не применяются
+- Веса не применяются (passthrough)
+- **Decay применяется всегда** (если decay16 > 0)
+
+```python
+# Decay тянет к 0 даже на locked тайлах
+if decay16 > 0:
+  if thr_cur16 > 0:
+    thr_cur16 = max(thr_cur16 - decay16, 0)
+  elif thr_cur16 < 0:
+    thr_cur16 = min(thr_cur16 + decay16, 0)
+```
 
 ---
 

@@ -28,6 +28,8 @@
 | **locked** | 0/1 | Fuse latched |
 | **drive_vec[8]** | u8[8] | Output values (0..15) |
 
+> **Note:** Decay is always applied (if decay16 > 0), even on locked tiles.
+
 ---
 
 ## 🔄 ACTIVE Closure (Activation Graph)
@@ -84,6 +86,8 @@ Tick N+1: Descendant activates via BUS_R → reads VSB_INGRESS → computes
 
 ### Decay-to-Zero + Fuse-by-Range
 
+**Decay is always applied** (if decay16 > 0), even on locked tiles.
+
 If `locked_before == 0`:
 
 ```python
@@ -112,20 +116,44 @@ entered_by_decay = (decay16 > 0) AND (in_range == true) AND (in_range_before_dec
 locked_after = (BAKE_APPLIED == 1) AND in_range AND (has_signal OR entered_by_decay)
 ```
 
+If `locked_before == 1`:
+
+```python
+locked_after := 1
+# Weights not applied (passthrough)
+
+# Decay is always applied (if decay16 > 0)
+if decay16 > 0:
+  if thr_cur16 > 0:
+    thr_cur16 = max(thr_cur16 - decay16, 0)
+  elif thr_cur16 < 0:
+    thr_cur16 = min(thr_cur16 + decay16, 0)
+```
+
 ### Locked Passthrough
 
 If `locked_after == 1`, tile acts as "copper bridge":
 
 - Weight matrix W is **not applied**
 - `drive_vec[i] = in16[i]` for all i=0..7 (passthrough)
+- **Decay is applied** (if decay16 > 0, pulls thr_cur16 to 0)
 
 ### Latched State
 
 If `locked_before == 1`:
 
 - `locked_after := 1`
-- `thr_cur16` doesn't change
-- Weights/decay are not applied
+- Weights not applied (passthrough)
+- **Decay is always applied** (if decay16 > 0)
+
+```python
+# Decay pulls to 0 even on locked tiles
+if decay16 > 0:
+  if thr_cur16 > 0:
+    thr_cur16 = max(thr_cur16 - decay16, 0)
+  elif thr_cur16 < 0:
+    thr_cur16 = min(thr_cur16 + decay16, 0)
+```
 
 ---
 
