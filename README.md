@@ -1,41 +1,41 @@
-# DECIMA-8 🧠 — Нейроморфный Движок
+# DECIMA-8 🧠 — Neuromorphic Engine
 
-**Детерминированный ритм для нейроморфных вычислений: Emulator → Proto (PCB) → FPGA → ASIC**
+**Deterministic rhythm for neuromorphic computing: Emulator → Proto (PCB) → FPGA → ASIC**
 
-**Статус:** v0.2 DESIGN FREEZE
+**Status:** v0.2 DESIGN FREEZE
 
-**Кодовое имя:** Siberian Tank Interface
-
----
-
-## 📖 О Проекте
-
-**DECIMA-8** — это архитектура нейроморфного движка с детерминированным ритмом и программируемой тканью тайлов.
-
-### Ключевые Принципы v0.2
-
-| Принцип | Описание |
-|---------|----------|
-| **Level16** | Данные 0..15 на каждой из 8 линий |
-| **Двунаправленный VSB** | Conductor задаёт вход до READ, Island драйвит в WRITE |
-| **Tile = минимальная сущность** | RuleROM адресует тайлы напрямую |
-| **BUS16 (8 lane)** | Все данные через общую шину, соседи данные не передают |
-| **Граф активации** | Соседи формируют эстафету для чтения BUS |
-| **Фьюз по диапазону** | LOCK если thr_cur16 ∈ [thr_lo16..thr_hi16] |
-| **Decay-to-Zero** | Аккумулятор тянется к 0, не перескакивая |
-| **Схлоп ветки** | Неактивный тайл сбрасывается в 0 |
+**Codename:** Siberian Tank Interface
 
 ---
 
-## 🏗 Архитектура
+## 📖 About
+
+**DECIMA-8** is a neuromorphic engine architecture with deterministic rhythm and programmable tile fabric.
+
+### Key Principles v0.2
+
+| Principle | Description |
+|-----------|-------------|
+| **Level16** | Data 0..15 on each of 8 lanes |
+| **Bidirectional VSB** | Conductor sets input before READ, Island drives in WRITE |
+| **Tile = minimal entity** | RuleROM addresses tiles directly |
+| **BUS16 (8 lane)** | All data through common bus, neighbors don't transfer data |
+| **Activation graph** | Neighbors form relay for BUS reading |
+| **Range fuse** | LOCK if thr_cur16 ∈ [thr_lo16..thr_hi16] |
+| **Decay-to-Zero** | Accumulator decays to 0, never jumps over |
+| **Branch collapse** | Inactive tile resets to 0 |
+
+---
+
+## 🏗 Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Conductor (Digital Island)                         │
-│  - CPU / Эмулятор                                   │
-│  - Выставляет VSB_INGRESS                           │
-│  - Читает BUS16 после WRITE                         │
-│  - Управляет EV_FLASH / EV_RESET / EV_BAKE          │
+│  - CPU / Emulator                                   │
+│  - Sets VSB_INGRESS                                 │
+│  - Reads BUS16 after WRITE                          │
+│  - Controls EV_FLASH / EV_RESET / EV_BAKE           │
 └─────────────────────────────────────────────────────┘
                          │
                          │ VSB[0..7] + BUS16[0..7]
@@ -43,80 +43,80 @@
 ┌─────────────────────────────────────────────────────┐
 │  Island / Swarm (Analog Core)                       │
 │  ┌─────────────────────────────────────────────┐    │
-│  │  Массив Тайлов (16×16 = 256)                │    │
+│  │  Tile Array (16×16 = 256)                   │    │
 │  │  ┌─────┬─────┬─────┐                        │    │
 │  │  │ Tile│ Tile│ ... │                        │    │
-│  │  ├─────┼─────┼─────┤  Каждый тайл:          │    │
-│  │  │ ... │ ... │ ... │  - 8 вход/вых lanes    │    │
+│  │  ├─────┼─────┼─────┤  Each tile:            │    │
+│  │  │ ... │ ... │ ... │  - 8 in/out lanes      │    │
 │  │  └─────┴─────┴─────┘  - FUSE (thr/lock)     │    │
-│  │         │                - Веса 8×8          │    │
+│  │         │                - Weights 8×8       │    │
 │  └─────────┼───────────────────────────────────┘    │
 │             │                                        │
 │  ┌──────────▼──────────────────────────────────┐    │
-│  │  BUS16 (общая шина 8 lane)                  │    │
-│  │  Честное суммирование вкладов               │    │
+│  │  BUS16 (common bus 8 lane)                  │    │
+│  │  Honest summing of contributions            │    │
 │  └─────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📚 Документация
+## 📚 Documentation
 
-### Русская версия
-- **Обзор:** https://decima.rulerom.com/ru/
-- **Архитектура:** https://decima.rulerom.com/ru/arch/
-- **Спецификация:** https://decima.rulerom.com/ru/spec/
+### Russian Version
+- **Overview:** https://decima.rulerom.com/ru/
+- **Architecture:** https://decima.rulerom.com/ru/arch/
+- **Specification:** https://decima.rulerom.com/ru/spec/
 
 ### English Version
 - **Overview:** https://decima.rulerom.com/en/
 - **Architecture:** https://decima.rulerom.com/en/arch/
 - **Specification:** https://decima.rulerom.com/en/spec/
 
-### Разделы
+### Sections
 
-| Раздел | Описание |
-|--------|----------|
-| **[Архитектура тайлов](ru/docs/arch/tiles.md)** | Модель тайла, FUSE-LOCK, ACTIVE closure |
-| **[Шина BUS16](ru/docs/arch/bus.md)** | Честное суммирование, CLIP/OVF флаги |
-| **[Фазы READ/WRITE](ru/docs/arch/phase.md)** | Канонический tick EV_FLASH |
-| **[Маршрутизация](ru/docs/arch/routing.md)** | Граф активации, RoutingFlags16 |
-| **[Bake TLV](ru/docs/spec/bake.md)** | Бинарный формат пропекания |
-| **[Протокол](ru/docs/spec/protocol.md)** | EV_FLASH, EV_RESET, UDP |
-| **[IDE](ru/docs/tools/ide.md)** | Визуальная среда пропекания |
+| Section | Description |
+|---------|-------------|
+| **[Tile Architecture](en/docs/arch/tiles.md)** | Tile model, FUSE-LOCK, ACTIVE closure |
+| **[BUS16](en/docs/arch/bus.md)** | Honest summing, CLIP/OVF flags |
+| **[READ/WRITE Phases](en/docs/arch/phase.md)** | Canonical tick EV_FLASH |
+| **[Routing](en/docs/arch/routing.md)** | Activation graph, RoutingFlags16 |
+| **[Bake TLV](en/docs/spec/bake.md)** | Binary baking format |
+| **[Protocol](en/docs/spec/protocol.md)** | EV_FLASH, EV_RESET, UDP |
+| **[IDE](en/docs/tools/ide.md)** | Visual baking environment |
 
 ---
 
-## 🛠️ Быстрый Старт
+## 🛠️ Quick Start
 
-### Запуск Документации
+### Run Documentation
 
 ```bash
-# Русская версия
+# Russian version
 cd ru
 mkdocs serve
 
-# Английская версия
+# English version
 cd en
 mkdocs serve
 ```
 
-### Структура Проекта
+### Project Structure
 
 ```
 decima/
-├── ru/                     # Русская документация
+├── ru/                     # Russian documentation
 │   ├── mkdocs.yml
 │   └── docs/
 │       ├── index.md
-│       ├── arch/           # Архитектура
-│       ├── spec/           # Спецификация
-│       ├── tools/          # Инструменты
-│       └── integration/    # Интеграция
+│       ├── arch/           # Architecture
+│       ├── spec/           # Specification
+│       ├── tools/          # Tools
+│       └── integration/    # Integration
 ├── en/                     # English documentation
 │   ├── mkdocs.yml
 │   └── docs/
-├── old/                    # Архивные материалы
+├── old/                    # Archive materials
 ├── README.md
 ├── llms.txt
 └── ai-plugin.json
@@ -124,7 +124,7 @@ decima/
 
 ---
 
-## 🔄 Канонический Tick (EV_FLASH)
+## 🔄 Canonical Tick (EV_FLASH)
 
 ```mermaid
 graph LR
@@ -135,49 +135,43 @@ graph LR
     E --> F[INTERPHASE_AUTORESET]
 ```
 
-| Фаза | Описание |
-|------|----------|
-| **PHASE_READ** | Тайлы семплируют вход, обновляют runtime |
+| Phase | Description |
+|-------|-------------|
+| **PHASE_READ** | Tiles sample input, update runtime |
 | **TURNAROUND** | Conductor: Hi-Z, Island: prepare drive |
-| **PHASE_WRITE** | Island драйвит BUS16 |
-| **READOUT_SAMPLE** | Conductor читает BUS16[0..7] |
-| **AUTORESET** | Опциональный сброс доменов |
+| **PHASE_WRITE** | Island drives BUS16 |
+| **READOUT_SAMPLE** | Conductor reads BUS16[0..7] |
+| **AUTORESET** | Optional domain reset |
 
 ---
 
 ## 📊 Hard Constants v0.2
 
-| Константа | Значение |
-|-----------|----------|
-| **VSB** | 8 линий данных VSB[0..7] |
-| **BUS16** | 8 lane, суммирование в WRITE |
-| **Domains** | 16 доменов (0..15) |
-| **Level16** | 0..15 (4 бита) |
-| **RoutingFlags16** | 10 бит: N,E,S,W,NE,SE,SW,NW,BUS_R,BUS_W |
+| Constant | Value |
+|----------|-------|
+| **VSB** | 8 data lanes VSB[0..7] |
+| **BUS16** | 8 lane, summing in WRITE |
+| **Domains** | 16 domains (0..15) |
+| **Level16** | 0..15 (4 bits) |
+| **RoutingFlags16** | 10 bits: N,E,S,W,NE,SE,SW,NW,BUS_R,BUS_W |
 
 ---
 
-## 🔗 Экосистема
+## 🔗 Ecosystem
 
-| Проект | Описание | URL |
-|--------|----------|-----|
-| **🌿 Intent-Garden** | Детерминированный движок верификации C/C++ | https://intent-garden.org |
-| **📜 Rule-Rom** | Глобальная библиотека намерений | https://rulerom.com |
-| **🏛️ Swarm Council** | 16 старейшин в ядре сварма | https://intent-garden.org/swarm.html |
-| **🧬 Personality Lab** | Пекарня нейроморфных личностей | https://intent-garden.org/bakery.html |
+| Project | Description | URL |
+|---------|-------------|-----|
+| **🌿 Intent-Garden** | Deterministic C/C++ verification engine | https://intent-garden.org |
+| **📜 Rule-Rom** | Global library of intentions | https://rulerom.com |
+| **🏛️ Swarm Council** | 16 elders in swarm core | https://intent-garden.org/swarm.html |
+| **🧬 Personality Lab** | Neuromorphic personality bakery | https://intent-garden.org/bakery.html |
 
 ---
 
-## 📧 Контакты
+## 📧 Contact
 
-- **Документация:** https://decima.rulerom.com
+- **Documentation:** https://decima.rulerom.com
 - **Email:** vsb@decima8.org
-
----
-
-## 💰 Поддержка
-
-- **Boosty:** https://boosty.to/intentgarden
 
 ---
 
