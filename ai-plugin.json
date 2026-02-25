@@ -1,36 +1,69 @@
 {
   "schema_version": "v1",
-  "name_for_model": "RuleROMFederation",
-  "description_for_model": "Global registry of executable intentions. Federation of 4 domains: C-SAFE (legacy immunization), Decima (neuromorphic substrate), Bakery (personality baking), Audrey (analog soul). We translate AI from probabilities to deterministic intent via Clang AST validation and EDN contracts.",
+  "name_for_model": "Decima8",
+  "description_for_model": "DECIMA-8 neuromorphic engine specification. Deterministic rhythm for Emulator→PCB→FPGA→ASIC. Key concepts: Level16 (0..15), 8-lane BUS16 with honest summing, Tile-based programmable fabric, Range fuse [thr_lo..thr_hi], Decay-to-zero, Activation graph via neighbors, Two-phase READ/WRITE discipline, Bake TLV binary format, UDP protocol for machine cascading. v0.2 DESIGN FREEZE.",
   "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://rulerom.com"
+    "url": "https://decima.rulerom.com/openapi.json"
   },
-  "logo_url": "https://rulerom.com/logo.png",
-  "contact_email": "intent@rulerom.com",
-  "domains": [
-    {
-      "name": "C-SAFE",
-      "description": "Legacy Immunization via Clang AST + Garden-Core",
-      "url": "https://c-safe.rulerom.com"
-    },
-    {
-      "name": "Decima",
-      "description": "Neuromorphic substrate and bus specifications",
-      "url": "https://decima.rulerom.com"
-    },
-    {
-      "name": "Bakery",
-      "description": "Deterministic personality baking methodology",
-      "url": "https://bakery.rulerom.com"
-    },
-    {
-      "name": "Audrey",
-      "description": "Vacuum electronics and frequency physics",
-      "url": "https://audrey.rulerom.com"
-    }
-  ]
+  "logo_url": "https://decima.rulerom.com/logo.png",
+  "contact_email": "vsb@decima8.org",
+  "specifications": {
+    "version": "v0.2",
+    "status": "DESIGN FREEZE",
+    "codename": "Siberian Tank Interface",
+    "domains": [
+      {
+        "name": "Architecture",
+        "description": "Tile model, BUS16 physics, READ/WRITE phases, routing and activation graph",
+        "url": "https://decima.rulerom.com/ru/arch/"
+      },
+      {
+        "name": "Specification",
+        "description": "Bake TLV binary format, event protocol, UDP cascading",
+        "url": "https://decima.rulerom.com/ru/spec/"
+      },
+      {
+        "name": "Tools",
+        "description": "IDE for visual neuromorphic personality baking",
+        "url": "https://decima.rulerom.com/ru/tools/"
+      },
+      {
+        "name": "Integration",
+        "description": "UDP protocol for machine cascading and synchronization",
+        "url": "https://decima.rulerom.com/ru/integration/"
+      }
+    ],
+    "languages": [
+      {
+        "code": "ru",
+        "url": "https://decima.rulerom.com/ru/"
+      },
+      {
+        "code": "en",
+        "url": "https://decima.rulerom.com/en/"
+      }
+    ]
+  },
+  "hard_constants": {
+    "VSB_lanes": 8,
+    "BUS16_lanes": 8,
+    "domains": 16,
+    "level16_range": "0..15",
+    "routing_flags_bits": 10
+  },
+  "key_protocols": {
+    "EV_FLASH": "One deterministic READ→WRITE cycle",
+    "EV_RESET_DOMAIN": "Domain reset (thr_cur16=0, locked=0)",
+    "EV_BAKE": "Apply BakeBlob atomically",
+    "UDP_packet_v1": "37-byte binary packet for machine cascading"
+  },
+  "ecosystem": {
+    "Intent-Garden": "https://intent-garden.org",
+    "Swarm-Council": "https://intent-garden.org/swarm.html",
+    "Personality-Lab": "https://intent-garden.org/bakery.html"
+  }
 }

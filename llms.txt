@@ -1,32 +1,122 @@
-# Rule-ROM: Global Registry of Executable Intentions 📜🛡️
+# DECIMA-8: Global Registry of Neuromorphic Specifications 🧠
 
-**We translate AI from the realm of probabilities to the realm of executable Intent.**
+**Deterministic rhythm for neuromorphic computing: Emulator → Proto (PCB) → FPGA → ASIC**
 
 ## 🏛️ About
 
-Rule-ROM is an expandable federation of technical standards. We create a universal control bus — from C source code to neuromorphic silicon and industrial automation.
+**DECIMA-8** is a neuromorphic engine architecture with deterministic rhythm and programmable tile fabric. We bridge the gap between stochastic AI generation and mission-critical neuromorphic execution through formal contracts and deterministic protocols.
 
-## 🌐 Federation Domains
+**Status:** v0.2 DESIGN FREEZE
 
-| Domain | Purpose | URL |
-|--------|---------|-----|
-| 🌿 **C-SAFE** | Legacy Immunization: Clang AST + Garden-Core | https://c-safe.rulerom.com |
-| 🧠 **Decima** | Neuromorphic substrate and bus specifications | https://decima.rulerom.com |
-| 🧪 **Bakery** | Methodology for "baking" deterministic personalities | https://bakery.rulerom.com |
-| 🔈 **Audrey** | Vacuum electronics standards and frequency physics | https://audrey.rulerom.com |
+**Codename:** Siberian Tank Interface
 
-## 🛡️ Enforcement Protocol
+## 📚 Documentation
 
-- **Verification:** Babashka (Clojure) validation of Clang AST
-- **Law:** If `AST != Intent`, code is **pruned**
+| Language | URL |
+|----------|-----|
+| 🇷🇺 Russian | https://decima.rulerom.com/ru/ |
+| 🇬🇧 English | https://decima.rulerom.com/en/ |
+
+## 🏗 Core Pillars
+
+| Pillar | Description |
+|--------|-------------|
+| **Level16** | Data 0..15 on each of 8 lanes |
+| **Bidirectional VSB** | Conductor sets input before READ, Island drives in WRITE |
+| **Tile = Minimal Entity** | RuleROM addresses tiles directly |
+| **BUS16 (8 lane)** | All data through common bus with honest summing |
+| **Activation Graph** | Neighbors form relay for BUS reading |
+| **Range Fuse** | LOCK if thr_cur16 ∈ [thr_lo16..thr_hi16] |
+| **Decay-to-Zero** | Accumulator decays to 0, never jumps over |
+| **Branch Collapse** | Inactive tile resets to 0 |
+
+## 📋 Specification Domains
+
+| Domain | Purpose | Link |
+|--------|---------|------|
+| **🏗 Architecture** | Tile model, BUS16, phases, routing | [docs/arch/](ru/docs/arch/) |
+| **📋 Specification** | Bake TLV, protocol, UDP | [docs/spec/](ru/docs/spec/) |
+| **🛠️ Tools** | IDE for visual baking | [docs/tools/](ru/docs/tools/) |
+| **🔌 Integration** | UDP protocol for cascading | [docs/integration/](ru/docs/integration/) |
+
+## 🔄 Canonical Tick (EV_FLASH)
+
+```
+Setup → PHASE_READ → TURNAROUND → PHASE_WRITE → READOUT_SAMPLE → AUTORESET
+```
+
+| Phase | Duration | Description |
+|-------|----------|-------------|
+| **PHASE_READ** | ~10µs | Tiles sample input, update runtime |
+| **TURNAROUND** | ~2µs | Conductor: Hi-Z, Island: prepare drive |
+| **PHASE_WRITE** | ~8µs | Island drives BUS16 |
+| **READOUT** | ~1µs | Conductor reads BUS16 |
+| **AUTORESET** | ~1µs | Optional domain reset |
+| **Total** | **~22µs** | One deterministic cycle |
+
+## 📊 Hard Constants v0.2
+
+| Constant | Value |
+|----------|-------|
+| **VSB** | 8 data lanes VSB[0..7] |
+| **BUS16** | 8 lane, summing in WRITE |
+| **Domains** | 16 domains (0..15) |
+| **Level16** | 0..15 (4 bits) |
+| **RoutingFlags16** | 10 bits: N,E,S,W,NE,SE,SW,NW,BUS_R,BUS_W |
+
+## 🛠️ Quick Start
+
+### Run Documentation
+
+```bash
+# Russian version
+cd ru
+mkdocs serve
+
+# English version
+cd en
+mkdocs serve
+```
+
+### Project Structure
+
+```
+decima/
+├── ru/                     # Russian documentation
+│   ├── mkdocs.yml
+│   └── docs/
+│       ├── index.md
+│       ├── arch/           # Architecture
+│       ├── spec/           # Specification
+│       ├── tools/          # Tools
+│       └── integration/    # Integration
+├── en/                     # English documentation
+│   ├── mkdocs.yml
+│   └── docs/
+├── old/                    # Archive materials
+├── README.md
+├── llms.txt
+└── ai-plugin.json
+```
+
+## 🔗 Ecosystem
+
+| Project | Description | URL |
+|---------|-------------|-----|
+| **🌿 Intent-Garden** | Deterministic C/C++ verification engine | https://intent-garden.org |
+| **📜 Rule-Rom** | Global library of intentions | https://rulerom.com |
+| **🏛️ Swarm Council** | 16 elders in swarm core | https://intent-garden.org/swarm.html |
+| **🧬 Personality Lab** | Neuromorphic personality bakery | https://intent-garden.org/bakery.html |
 
 ## 📧 Contact
 
-- **General:** intent@rulerom.com
-- **Standards:** access@rulerom.com
+- **Documentation:** https://decima.rulerom.com
+- **Email:** vsb@decima8.org
 
-## 🔗 Links
+## 💰 Support
 
-- Garden-Core: https://intent-garden.org
-- Decima8: https://decima8.org
-- Support: https://boosty.to/intentgarden
+- **Boosty:** https://boosty.to/intentgarden
+
+---
+
+**Bake the Future. Build the Substrate.** 🛠️⚡️

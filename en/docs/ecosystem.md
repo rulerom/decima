@@ -39,27 +39,33 @@
 - Priority on collision
 - AutoReset-by-Fire
 
----
-
-## 🏠 Nomos
-
-**Sovereign financing and distributed swarm maintenance**
+**Website:** [intent-garden.org/swarm.html](https://intent-garden.org/swarm.html)
 
 ---
 
-## 🔈 Audrey
+## 🧬 Personality Lab
 
-**Warm soul. Place for embodying things that will outlive the era**
+**Neuromorphic personality bakery**
+
+Platform for publishing and monetizing author-created personalities.
+
+**Website:** [intent-garden.org/bakery.html](https://intent-garden.org/bakery.html)
 
 ---
 
 ## 🔗 Related Projects
 
-| Project | Description |
-|---------|-------------|
-| **Intent-Garden** | Deterministic C/C++ code verification engine |
-| **Rule-Rom** | Global library of intentions |
-| **LibWUI** | High-performance tools for industrial C++ |
+| Project | Description | URL |
+|---------|-------------|-----|
+| **Intent-Garden** | Deterministic C/C++ code verification engine | https://intent-garden.org |
+| **Rule-Rom** | Global library of intentions | https://rulerom.com |
+| **LibWUI** | High-performance tools for industrial C++ | https://libwui.org |
+
+---
+
+## 📧 Contact
+
+**Email:** vsb@decima8.org
 
 ---
 
