@@ -1,7 +1,7 @@
 {
   "schema_version": "v1",
   "name_for_model": "Decima8",
-  "description_for_model": "DECIMA-8 neuromorphic engine specification. Deterministic rhythm for Emulator→PCB→FPGA→ASIC. Key concepts: Level16 (0..15), 8-lane BUS16 with honest summing, Tile-based programmable fabric, Range fuse [thr_lo..thr_hi], Decay-to-zero, Activation graph via neighbors, Two-phase READ/WRITE discipline, Bake TLV binary format, UDP protocol for machine cascading. v0.2 DESIGN FREEZE.",
+  "description_for_model": "DECIMA-8 neuromorphic engine specification. Deterministic rhythm for Emulator→PCB→FPGA→ASIC. Key concepts: Level16 (0..15) on 8 physical lanes, BUS16 with honest summing, Tile-based programmable fabric, Range fuse [thr_lo..thr_hi] with hardware latch, Decay-to-zero (no residual state), Activation graph (Gating) with BUS_R flag, Access inheritance (descendants accumulate from zero if ancestor unfuses), Dedicated Pattern ID uint16 lane, Two-phase READ/WRITE discipline, Bake TLV binary format, UDP protocol for machine cascading. v0.2 DESIGN FREEZE.",
   "auth": {
     "type": "none"
   },
@@ -18,7 +18,7 @@
     "domains": [
       {
         "name": "Architecture",
-        "description": "Tile model, BUS16 physics, READ/WRITE phases, routing and activation graph",
+        "description": "Tile model, BUS16 physics, READ/WRITE phases, routing and activation graph with gating",
         "url": "https://decima.rulerom.com/ru/arch/"
       },
       {

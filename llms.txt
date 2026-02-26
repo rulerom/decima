@@ -22,14 +22,15 @@
 
 | Pillar | Description |
 |--------|-------------|
-| **Level16** | Data 0..15 on each of 8 lanes |
-| **Bidirectional VSB** | Conductor sets input before READ, Island drives in WRITE |
+| **Level16** | 8 physical lanes, each carrying 16 discrete levels (0..15) |
+| **Bidirectional VSB** | PHASE_READ: Conductor sets input; PHASE_WRITE: Island drives bus |
 | **Tile = Minimal Entity** | RuleROM addresses tiles directly |
 | **BUS16 (8 lane)** | All data through common bus with honest summing |
-| **Activation Graph** | Neighbors form relay for BUS reading |
-| **Range Fuse** | LOCK if thr_cur16 ∈ [thr_lo16..thr_hi16] |
-| **Decay-to-Zero** | Accumulator decays to 0, never jumps over |
-| **Branch Collapse** | Inactive tile resets to 0 |
+| **Dedicated Pattern ID Lane** | Separate uint16 channel for pattern output, doesn't clog main bus |
+| **Activation Graph (Gating)** | Neighbors form logical strobe to allow reading from common bus |
+| **Range Fuse (Latch)** | Hardware-level latch: activates only when level is within [lo..hi] range |
+| **Decay-to-Zero** | Accumulator deterministically decays to 0 each cycle, no residual state |
+| **Access Inheritance** | If ancestor unfuses — descendants start accumulating from zero; if it fuses again — they regain access |
 
 ## 📋 Specification Domains
 
