@@ -18,6 +18,40 @@ The Decima-8 specification is open for implementation. We welcome the creation o
 
 ---
 
+## 📜⚙️ Systolic Sieve: Technical Manifesto
+
+**Modern compute architecture is overloaded with logistics.** In classical AI, data is constantly copied, routed, and queued waiting for the processor (Bus Contention). This creates latencies that cannot be fixed in software.
+
+**Decima-8 is a systolic sieve.** There is no routing, no queues, and no "decision making". There is only geometry and resonance.
+
+### 1. Two-Phase Pulse (The Heartbeat)
+
+The system operates like an irrigation network with a rigid clock.
+
+- **PHASE_READ:** Data ("water") fills the common VSB bus. All tiles simultaneously access this stream. This is the moment of maximum entropy.
+- **PHASE_WRITE:** Tiles that "recognized" the input pattern latch and transmit their ID to a dedicated channel, or — if BUS_W flag is set — output their weight back to the bus for the next cascade.
+
+### 2. Sieving Mechanics
+
+A tile in this system is not a calculator, but a sieve cell.
+
+- The incoming data stream flies through the substrate.
+- If the stream configuration matches the geometry of "holes" (configured thresholds and weights) in the tile, physical resonance occurs.
+- The tile fires instantly, without wasting time on arithmetic summation operations. This is determinism: either the pattern passes through the sieve, or it does not.
+
+### 3. Hierarchy Without Routers
+
+Instead of complex network protocols, we use a "Father — Son" hierarchy.
+
+- The upper node (Conductor/Father) opens "gates" (activation graphs) for lower nodes (Islands/Children).
+- Data is always common, but access to it is controlled by the network structure itself. This eliminates collisions and allows achieving a cycle of 20–40 µs.
+
+### 4. Synthesis Goal
+
+The systolic sieve transforms market noise, video streams, or audio signals into **Pattern ID**. We do not "analyze" data — we sieve out the excess, leaving only pure **Intent**.
+
+---
+
 ### Key Principles v0.2
 
 | Principle | Description |
