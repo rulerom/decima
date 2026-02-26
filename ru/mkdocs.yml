@@ -25,6 +25,7 @@ extra:
 nav:
   - '📖 Главная':
     - 'Обзор': index.md
+    - 'Контракт': CONTRACT.md
     - 'IDE': tools/ide.md
 
   - '🏗 Архитектура':
