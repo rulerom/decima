@@ -12,6 +12,12 @@
 
 **DECIMA-8** is a neuromorphic engine architecture with deterministic rhythm and programmable tile fabric.
 
+### Open Specification
+
+The Decima-8 specification is open for implementation. We welcome the creation of alternative kernels compatible with this specification. The only requirement is verification through Rule-ROM PKI to maintain determinism.
+
+---
+
 ### Key Principles v0.2
 
 | Principle | Description |
