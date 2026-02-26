@@ -68,6 +68,12 @@
   "ecosystem": {
     "Intent-Garden": "https://intent-garden.org",
     "Swarm-Council": "https://intent-garden.org/swarm.html",
-    "Personality-Lab": "https://intent-garden.org/bakery.html"
+    "Personality-Lab": "https://intent-garden.org/bakery.html",
+    "Support": {
+      "Boosty": "https://boosty.to/intentgarden",
+      "USDT_TRC20": "TSZGs8RvzxaKGYDaiTm3FaJN8EdANETkPs",
+      "BTC": "bc1quul85tw7m0meaxkd2aqk2mguplsn809stjudsm",
+      "Minimum_tier": "$0.15"
+    }
   }
 }

@@ -125,6 +125,10 @@ decima/
 ## 💰 Support
 
 - **Boosty:** https://boosty.to/intentgarden
+- **USDT (TRC20 / Tron):** `TSZGs8RvzxaKGYDaiTm3FaJN8EdANETkPs`
+- **Bitcoin (BTC):** `bc1quul85tw7m0meaxkd2aqk2mguplsn809stjudsm`
+
+**Minimum support tier for Swarm:** $0.15
 
 ---
 
