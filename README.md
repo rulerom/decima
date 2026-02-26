@@ -73,6 +73,11 @@
 - **Architecture:** https://decima.rulerom.com/en/arch/
 - **Specification:** https://decima.rulerom.com/en/spec/
 
+### 中文版
+- **概述：** https://decima.rulerom.com/zh/
+- **架构：** https://decima.rulerom.com/zh/arch/
+- **规范：** https://decima.rulerom.com/zh/spec/
+
 ### Sections
 
 | Section | Description |
@@ -99,6 +104,10 @@ mkdocs serve
 # English version
 cd en
 mkdocs serve
+
+# Chinese version
+cd zh
+mkdocs serve
 ```
 
 ### Project Structure
@@ -114,6 +123,9 @@ decima/
 │       ├── tools/          # Tools
 │       └── integration/    # Integration
 ├── en/                     # English documentation
+│   ├── mkdocs.yml
+│   └── docs/
+├── zh/                     # Chinese documentation
 │   ├── mkdocs.yml
 │   └── docs/
 ├── old/                    # Archive materials

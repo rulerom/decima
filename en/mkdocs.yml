@@ -20,7 +20,7 @@ extra_css:
 extra:
   analytics:
     provider: yandex
-    property: 107005401
+    property: 107008715
 
 nav:
   - '📖 Home':

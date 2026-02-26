@@ -16,6 +16,7 @@
 |----------|-----|
 | 🇷🇺 Russian | https://decima.rulerom.com/ru/ |
 | 🇬🇧 English | https://decima.rulerom.com/en/ |
+| 🇨🇳 Chinese | https://decima.rulerom.com/zh/ |
 
 ## 🏗 Core Pillars
 
@@ -76,6 +77,10 @@ mkdocs serve
 # English version
 cd en
 mkdocs serve
+
+# Chinese version
+cd zh
+mkdocs serve
 ```
 
 ### Project Structure
@@ -91,6 +96,9 @@ decima/
 │       ├── tools/          # Tools
 │       └── integration/    # Integration
 ├── en/                     # English documentation
+│   ├── mkdocs.yml
+│   └── docs/
+├── zh/                     # Chinese documentation
 │   ├── mkdocs.yml
 │   └── docs/
 ├── old/                    # Archive materials

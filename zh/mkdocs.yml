@@ -1,0 +1,39 @@
+site_name: DECIMA-8 🧠 — 神经形态引擎
+site_url: https://decima.rulerom.com
+theme:
+  name: material
+  palette:
+    scheme: slate
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+  custom_dir: overrides
+
+plugins:
+  - search
+  - mermaid2
+
+extra_css:
+  - css/mermaid.css
+
+nav:
+  - '📖 主页':
+    - '概述': index.md
+    - '合约': CONTRACT.md
+    - 'IDE': tools/ide.md
+
+  - '🏗 架构':
+    - '图块': arch/tiles.md
+    - 'BUS16': arch/bus.md
+    - 'READ/WRITE 阶段': arch/phase.md
+    - '路由': arch/routing.md
+
+  - '📋 规范':
+    - 'Bake TLV': spec/bake.md
+    - '协议': spec/protocol.md
+
+  - '🔌 集成':
+    - 'UDP 协议': integration/udp.md
+
+  - '💎 生态系统': ecosystem.md

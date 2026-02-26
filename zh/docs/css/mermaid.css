@@ -1,0 +1,10 @@
+/* Mermaid diagram styles for dark theme */
+.mermaid {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.mermaid svg {
+    background-color: #ffffff;
+}
