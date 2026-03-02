@@ -382,16 +382,19 @@ thr_hi16 ∈ [-32768..+32767]  // signed i16
 ### 3.1 Conductor ↔ Island
 
 ```mermaid
-graph TB
+graph TD
     subgraph Digital["🎼 ЦИФРОВОЙ ДИРИЖЁР (Conductor)"]
         CPU[CPU / FPGA / ПК]
         IDE[IDE: Визуальная пропечка]
         CFG[Config Plane<br/>SPI-like]
     end
     
+    %% Невидимая связь для принудительного вертикального позиционирования
+    Digital ~~~ Analog
+
     subgraph Analog["⚡ АНАЛОГОВЫЙ ОСТРОВ (Swarm Island)"]
-        %% Оставляем Tiles как подграф для логического выделения, 
-        %% но внутри рисуем один массивный блок
+        direction TB
+        
         subgraph Tiles_Area["Поле тайлов"]
             Tiles[("<b>Tiles Array</b><br/>4096 ячеек (0..4095)<br/>[ Parallel Processors ]")]
         end
@@ -401,17 +404,23 @@ graph TB
         PID[<b>PATTERN_ID</b><br/>выделенный канал]
     end
     
-    CPU -->|EV_FLASH| VSB
-    CPU -->|EV_BAKE| CFG
-    CFG -->|загрузка весов и связей| Tiles
+    %% Потоки сверху вниз
+    CPU ==>|EV_FLASH| VSB
+    CPU ==>|EV_BAKE| CFG
+    
+    %% Внутренние связи Острова
+    CFG -.->|загрузка весов| Tiles
     VSB -->|READ phase| Tiles
     Tiles -->|WRITE phase| BUS
     Tiles -->|domain winner| PID
-    BUS -->|readout| CPU
-    PID -->|pattern ID| CPU
     
-    style Digital fill:#e1f5ff,stroke:#0366d6
-    style Analog fill:#fff5e1,stroke:#fb8500
+    %% Обратная связь (снизу вверх)
+    BUS --o|readout| CPU
+    PID --o|pattern ID| CPU
+    
+    %% Стилизация
+    style Digital fill:#e1f5ff,stroke:#0366d6,stroke-width:2px
+    style Analog fill:#fff5e1,stroke:#fb8500,stroke-width:2px
     style Tiles fill:#fff,stroke:#fb8500,stroke-width:2px
     style VSB fill:#ffebee,stroke:#c62828
     style BUS fill:#e8f5e9,stroke:#2e7d32
