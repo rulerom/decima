@@ -16,6 +16,7 @@ plugins:
 
 extra_css:
   - css/mermaid.css
+  - assets/rulerom.css
 
 nav:
   - '📖 主页':

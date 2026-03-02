@@ -16,6 +16,7 @@ plugins:
 
 extra_css:
   - css/mermaid.css
+  - assets/rulerom.css
 
 extra:
   analytics:
@@ -25,6 +26,7 @@ extra:
 nav:
   - '📖 Главная':
     - 'Обзор': index.md
+    - 'Кодекс': codex/index.md
     - 'Контракт': CONTRACT.md
     - 'IDE': tools/ide.md
 
