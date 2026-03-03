@@ -21,6 +21,7 @@ extra_css:
 nav:
   - '📖 主页':
     - '概述': index.md
+    - 'Codex': codex/index.md
     - '合约': CONTRACT.md
     - 'IDE': tools/ide.md
 

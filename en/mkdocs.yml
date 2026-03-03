@@ -26,6 +26,7 @@ extra:
 nav:
   - '📖 Home':
     - 'Overview': index.md
+    - 'Codex': codex/index.md
     - 'Contract': CONTRACT.md
     - 'IDE': tools/ide.md
 

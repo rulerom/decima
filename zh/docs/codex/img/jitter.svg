@@ -1,0 +1,46 @@
+<svg viewBox="0 0 800 250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон -->
+  <rect width="800" height="300" fill="#ffffff" rx="10" />
+  
+  <!-- Шкала времени -->
+  <line x1="50" y1="220" x2="750" y2="220" stroke="#333" stroke-width="2" />
+  <text x="400" y="260" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle">Задержка (Latency) / Предсказуемость</text>
+
+  <!-- 1. ASIC (Hardware) - Идеальная игла -->
+  <line x1="80" y1="80" x2="80" y2="220" stroke="#d32f2f" stroke-width="4" />
+  <circle cx="80" cy="220" r="6" fill="#d32f2f" />
+  <text x="80" y="70" font-family="Arial" font-size="14" font-weight="bold" fill="#b71c1c" text-anchor="middle">ASIC</text>
+  <text x="80" y="50" font-family="monospace" font-size="16" fill="#b71c1c" font-weight="bold" text-anchor="middle">20 нс</text>
+  <text x="80" y="240" font-family="Arial" font-size="10" fill="#d32f2f" text-anchor="middle">Jitter: 0</text>
+
+  <!-- 2. ЭМУЛЯТОР (CPU) - Стабильный такт -->
+  <line x1="280" y1="100" x2="280" y2="220" stroke="#0366d6" stroke-width="3" />
+  <circle cx="280" cy="220" r="5" fill="#0366d6" />
+  <text x="280" y="90" font-family="Arial" font-size="14" font-weight="bold" fill="#0366d6" text-anchor="middle">ЭМУЛЯТОР</text>
+  <text x="280" y="70" font-family="monospace" font-size="16" fill="#0366d6" font-weight="bold" text-anchor="middle">20 мкс</text>
+  <text x="280" y="240" font-family="Arial" font-size="10" fill="#0366d6" text-anchor="middle">Jitter: ~3нс</text>
+
+  <!-- 3. GPU / CUDA - Зона хаоса -->
+  <!-- Градиент для имитации джиттера -->
+  <defs>
+    <linearGradient id="jitterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffecb3" stop-opacity="0.2" />
+      <stop offset="20%" stop-color="#ffb300" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#ffb300" stop-opacity="1" />
+      <stop offset="80%" stop-color="#ffb300" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#ffecb3" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  
+  <rect x="450" y="120" width="250" height="20" fill="url(#jitterGrad)" rx="10" />
+  <line x1="575" y1="140" x2="575" y2="220" stroke="#ffb300" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="575" y="110" font-family="Arial" font-size="14" font-weight="bold" fill="#f57c00" text-anchor="middle">GPU (CUDA/OpenCL)</text>
+  <text x="575" y="90" font-family="monospace" font-size="16" fill="#f57c00" font-weight="bold" text-anchor="middle">~50 мкс ± 30 мкс</text>
+  
+  <!-- Подпись бара Jitter -->
+  <path d="M 450 150 L 450 160 L 700 160 L 700 150" fill="none" stroke="#f57c00" stroke-width="1" />
+  <text x="575" y="175" font-family="Arial" font-size="12" fill="#f57c00" text-anchor="middle" font-style="italic">JITTER: Зона неопределенности</text>
+
+  <!-- Легенда -->
+  <text x="750" y="210" font-family="monospace" font-size="10" text-anchor="end">∞ (Стохастика)</text>
+</svg>

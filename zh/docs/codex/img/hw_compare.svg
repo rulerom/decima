@@ -1,0 +1,43 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон и сетка -->
+  <rect width="800" height="400" fill="#f8f9fa" rx="10" />
+  <path d="M 100 320 L 750 320" stroke="#333" stroke-width="2" />
+  <path d="M 100 50 L 100 320" stroke="#333" stroke-width="2" />
+  <path d="M 100 50 L 750 50" stroke="#ddd" stroke-dasharray="5,5" />
+  <path d="M 100 185 L 750 185" stroke="#ddd" stroke-dasharray="5,5" />
+
+  <!-- Ось Y (мкс) -->
+  <text x="90" y="325" font-family="Arial" font-size="12" text-anchor="end">0</text>
+  <text x="90" y="190" font-family="Arial" font-size="12" text-anchor="end">11</text>
+  <text x="90" y="55" font-family="Arial" font-size="12" text-anchor="end">22</text>
+  <text x="45" y="185" font-family="Arial" font-size="14" font-weight="bold" transform="rotate(-90 45,185)" text-anchor="middle">Задержка (мкс)</text>
+
+  <!-- БАРЫ (на 256 тайлов) -->
+  
+  <!-- i5-3550 (Baseline) -->
+  <rect x="150" y="50" width="80" height="270" fill="#90a4ae" />
+  <text x="190" y="340" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">i5-3550</text>
+  <text x="190" y="45" font-family="Arial" font-size="12" text-anchor="middle">22 мкс</text>
+  <text x="190" y="355" font-family="Arial" font-size="10" fill="#666" text-anchor="middle">(2012)</text>
+
+  <!-- i5-12600K -->
+  <rect x="300" y="228" width="80" height="92" fill="#0366d6" />
+  <text x="340" y="340" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">i5-12600K</text>
+  <text x="340" y="220" font-family="Arial" font-size="12" text-anchor="middle">~7.5 мкс</text>
+
+  <!-- Ryzen 9 7950X -->
+  <rect x="450" y="258" width="80" height="62" fill="#d32f2f" />
+  <text x="490" y="340" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">R9 7950X</text>
+  <text x="490" y="250" font-family="Arial" font-size="12" text-anchor="middle">~5 мкс</text>
+
+  <!-- Apple M2 -->
+  <rect x="600" y="246" width="80" height="74" fill="#673ab7" />
+  <text x="640" y="340" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">Apple M2</text>
+  <text x="640" y="240" font-family="Arial" font-size="12" text-anchor="middle">~6 мкс</text>
+
+  <!-- Пометка FPGA/ASIC -->
+  <path d="M 720 318 L 745 318" stroke="#388e3c" stroke-width="4" />
+  <text x="750" y="310" font-family="Arial" font-size="12" fill="#388e3c" font-weight="bold" text-anchor="end">FPGA (~1 мкс)</text>
+  
+  <text x="400" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">Прогноз задержки на 256 тайлов (Cycle Time)</text>
+</svg>
