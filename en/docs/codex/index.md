@@ -6,40 +6,42 @@
 
 ## 1. INTRODUCTION
 
-Modern neuromorphic computing is stuck between two fires.
+Modern neuromorphic systems face two independent problems.
 
-On one side — **binary spiking neural networks (SNN)**. To transmit "signal strength", they must use spike frequency or temporal patterns. This is like drawing grayscale by blinking a lightbulb: possible, but slow. One activation level requires **dozens of clock cycles** of accumulation. In applications where latency matters (robotics, HFT, perimeter defense), this is an unaffordable luxury.
+**Problem 1: Information Encoding**
 
-On the other side — **analog memristor chips**. They promise natural neuromorphicity, but face reality: noise, parameter drift, nondeterminism. Each chip is unique, requires calibration, and reproducibility is painful. Plus **40% of die area** goes to packet-switching routers that spend **70% of energy** not on computation, but on data transfer.
+**Binary spiking neural networks (SNN) transmit signal gradations through:**
 
-**Decima-8 offers a third way.**
+- Frequency coding (multiple clocks per value)
+- Increasing number of transmission lines
 
-We don't choose between "slow digital" and "noisy analog". We build digital emulation of analog dynamics with multi-bit activation in one clock cycle.
+**Problem 2: Hardware Implementation**
 
-**Our hypothesis:**
+**Analog memristor crossbars promise natural neuromorphicity, but contain following problems:**
 
-1. **Level16** — activation from 0 to 15 transmitted in one clock, without iterative accumulation. This is not "imprecise int", but a semantic unit: "energy level", "intention strength".
-2. **Relay activation instead of packet routing.** Tiles don't transfer data to each other — they form an activation graph via direction flags (N/E/S/W). Result: 0% area on routers, determinism at clock level.
-3. **Two-phase cycle READ → WRITE with fixed cycle time.** No stochastic delays. No "depending on load".
+- Noise and parameter drift
+- Non-deterministic computation
+- Each chip requires individual calibration
 
-> *"We don't emulate neurons. We build a fabric where recognition is physics."*
+**Traditional Network-on-Chip (NoC) adds overhead:**
 
-**What's in this paper:**
+- ~40% of die area goes to routers
+- ~70% of energy spent on data transfer, not computation
 
-- **Mathematics:** Level16, SignedWeight5, activation function, signed decay-to-zero. Formulas without magic.
-- **Architecture:** Conductor ↔ Island, relay transfer, router-less NoC. Diagrams and benchmarks.
-- **Security:** Honest talk about vulnerabilities. Why .d8p cannot be a virus.
-- **Ecosystem:** Open D8P format, 1.3 MB IDE, emulator with bit-accurate compatibility.
+**Decima-8 offers:**
 
-We don't promise AGI. We promise determinism, efficiency, and expressiveness that modern architectures lack.
+- **Level16:** encoding activation level (0..15) in one clock on one line. This is a compromise between binary representation and analog continuity.
+- **Digital crossbars (memristor matrix emulation):** determinism, reproducibility, no noise
+- **Relay activation instead of packet routing:** tiles don't transfer data to each other, activation propagates through dependency graph
+- **Result:** fixed latency, predictable behavior, 0% area on routers.
 
-Ready? Let's dive into the math.
+> *⚛︎ We don't emulate neurons. We build a fabric where recognition is physics.*
 
 ---
 
 ## 2. MATHEMATICAL FOUNDATIONS
 
-No magic here. Only pure mathematics that makes Decima-8 both powerful and predictable. If you've ever felt that neuromorphic papers are written in elvish with a hint of marketing — relax. We'll speak the language of numbers.
+Decima-8 architecture is based on deterministic integer arithmetic. This section provides computation specifications: data formats, activation formulas, and tile logic. All values have fixed ranges, guaranteeing reproducible results on any hardware.
 
 ### 2.1 Level16: Semantic Tetrad
 
@@ -47,104 +49,85 @@ No magic here. Only pure mathematics that makes Decima-8 both powerful and predi
 
 *Level16 in IDE Accordion*
 
-**Problem of binary spikes:**
+In traditional spiking architectures, signal intensity is encoded either in time (spike frequency) or in space (number of parallel channels). Both approaches require compromise: either latency or wiring complexity.
 
-To transmit value "7", a classical SNN must generate 7 spikes over N clocks. This is frequency coding. It's like transmitting text via Morse code: possible, but each letter requires a series of dots and dashes.
-
-**Decima-8 solution:**
+Decima-8 uses **Level16** — representing activation level as 4-bit value (0..15) on one line in one clock:
 
 ```
 thr_cur16 ∈ [0..15]  // 4 bits, one tetrad
 ```
 
-One clock = *one value*. Not frequency, not pattern, not "number of spikes per window". Just a number from 0 to 15.
+This is not an attempt to "emulate analog with digital", but a conscious data format choice:
 
-| Architecture | Coding | Clocks per value |
-|--------------|--------|------------------|
-| Loihi / SpiNNaker | spike ∈ {0, 1} | N clocks (frequency) |
-| Decima-8 | activation ∈ {0..15} | 1 clock |
+- **Enough gradations** for neuromorphic pattern expressiveness
+- **Fits in nibble** — convenient for packed formats and bit operations
+- **Fixed size** — deterministic arithmetic, no dynamic normalization
 
-**Why exactly 16 levels?**
+**Physical meaning of Level16:**
 
-We experimented. Level8 (0..7) — too coarse, patterns are "stepped". Level32 (0..31) — excessive for neuromorphic fabric, plus extra bits in bus. Level16 — **golden mean:**
+- `0` — no activation
+- `15` — saturation
+- `1..14` — "intention strength" gradations
 
-- Enough gradations for expressiveness
-- Doesn't overload bus (8 lanes × 4 bits = 32 bits per clock)
-- Fits in nibble (convenient for packed formats)
+On VSB bus this is just a signal level. Inside the tile — an operand for arithmetic with SignedWeight5 weights.
 
-**Physical meaning:**
+> *💭 **Essence:** Level16 is not "imprecise int". It's a semantic unit of the architecture, like float32 in classical neural networks. Only deterministic and hardware-friendly.*
 
-Level16 is not "imprecise int". It's a semantic unit:
-
-- 0 — silence, no activation
-- 15 — saturation, maximum "intention strength"
-- 1..14 — energy gradations
-
-> *💭 Analogy: Imagine adjusting volume. Binary approach is "on/off". Level16 is a volume knob with 16 positions. You don't click the button 7 times to get desired volume. You just set the knob to 7.*
-
-⚠️ **Important: Decima-8 has no "synapses" in the traditional sense.**
-
-Each tile has **fixed 8 input lines** (VSB_INGRESS[0..7]). These lines come **from Conductor**, not from other tiles.
-The 8×8 weight matrix is a **local transformation** inside the tile:
-
-- 8 inputs (Level16) → 8 outputs (Level16)
-- Not "64 synapses", but 8 rows of 8 weights
-- Normalization /8 is not approximation, but exact division by constant
-
-### 2.2 SignedWeight5: Weighted connections with inhibition
+### 2.2 SignedWeight5: Weighted Connections with Inhibition
 
 ![Tile internals: 8 strings → crossbar → accumulator](img/tile.svg)
 
 *Tile structure: 8 strings → crossbar → accumulator*
 
-Each tile in Decima-8 has a weight matrix **8×8**. This emulates a memristor crossbar, but without analog noise — everything is deterministic and digital.
+Each tile contains digital emulation of memristor crossbar sized 8×8. 8 values `in16[0..7]` (Level16) come as input. Each value is multiplied by its weight and summed per row.
 
-**Weight encoding (5 bits):**
+**Weight encoding:** *SignedWeight5 (5 bits)*
 
 ```
-┌─────────────────────────────────┐
-│  SignedWeight5 (5 bits)         │
-├─────────────────────────────────┤
-│  bits 0-2: magnitude (0..7)     │  ← 3 bits, modulus
-│  bit 3: sign (0=-, 1=+)         │  ← 1 bit, sign
-│  bit 4: reserved (0)            │  ← padding for alignment
-└─────────────────────────────────┘
-
-weight ∈ [-7..+7]
+bits 0-2: magnitude (0..7)   // modulus
+bit 3:    sign (0=-, 1=+)    // sign
+bit 4:    reserved (0)       // alignment
 ```
 
-**Weighted sum formula** for row `r`:
+Weight range: **[-7..+7]**. Negative weights implement lateral inhibition at hardware level — this is not emulation, but direct consequence of signed arithmetic.
 
+Formula for one crossbar row:
 ```
 row_raw_signed[r] = Σ (in16[i] × weight[r][i])  // i=0..7
 ```
 
-**Range calculation:**
+Since `in16[i] ∈ [0..15]` and `weight ∈ [-7..+7]`, one cell's contribution lies in range **[-105..+105]**. Sum over 8 inputs gives **[-840..+840]** per row.
 
-| Parameter | Range | Comment |
-|-----------|-------|---------|
-| in16[i] | [0..15] | Always non-negative input |
-| weight[r][i] | [-7..+7] | Signed: mag3 + sign1 |
-| Single cell contribution | [-105..+105] | 15 × 7 |
-| Sum over 8 inputs | [-840..+840] | 8 × 105 |
+These 8 rows (`row_raw_signed[0..7]`) then diverge along two paths:
 
-**Important:** Negative weights are not a bug, they're a feature. They implement **lateral inhibition** at hardware level.
+1. To accumulator (without transformations) — signed values for accumulation and lock decision
+2. To VSB bus (through normalization and clamp15) — only non-negative values 0..15
 
-> *💭 Example: Tile receives excitatory signal (+5) on lane0, but inhibitory (-3) from lane1. Result: +2. This is not emulation — it's physics of computation. "Excitation/inhibition" balance is built into arithmetic.*
+> *💭 **Physical meaning:** If excitatory signal (+5) arrives on lane0, and inhibitory (-3) on lane1, their contributions simply sum: +5 + (-3) = +2. "Excitation/inhibition" balance is built into arithmetic, doesn't require separate logic.*
 
-### 2.3 Activation function: two paths of one signal
+**Why 5 bits per weight?**
 
-After computing `row_raw_signed[r]`, the signal goes **two different paths**. This is a key point of Decima-8 architecture.
+- 3 bits for modulus (0..7) — enough gradations for connection expressiveness
+- 1 bit for sign — inhibition support
+- 1 bit reserved — byte alignment, possibility for expansion in v1.0
+
+This is a compromise between precision and packing density: 64 weights × 5 bits = 40 bytes per tile, fits in cache line.
+
+Result `row_raw_signed[r]` goes to accumulator (always) and to bus (if BUS_R flag is set).
+
+### 2.3 Activation Function: Two Paths of One Signal
+
+After computing `row_raw_signed[r]`, the signal goes along two paths. **Path to accumulator is primary**, path to bus is conditional.
 
 ```mermaid
 graph TD
     Root["<b>Input signal</b><br/>row_raw_signed[r] ∈ [-840..+840]"]
-    Root ==> PathA["<b>[ PATH A ]</b><br/>To tile accumulator<br/>(thr_cur16 update)"]
-    Root ==> PathB["<b>[ PATH B ]</b><br/>To BUS16 / VSB<br/>(WRITE phase)"]
-    PathA --> CalcA["thr_cur16 += row_raw_signed[r]<br/>(signed i16)"]
-    CalcA --> ResultA["<b>Result:</b> i16<br/>[-32768..+32767]"]
+    Root ==> PathA["<b>[ PATH A ]</b><br/>To tile accumulator<br/>(always, signed, no clamp)"]
+    Root ==> PathB["<b>[ PATH B ]</b><br/>To BUS16 / VSB<br/>(only if BUS_R, WRITE phase)"]
+    PathA --> CalcA["thr_cur16 += row_raw_signed[r]"]
+    CalcA --> ResultA["(for lock and decay)"]
     PathB --> CalcB["row16_out = clamp15((max(row_raw, 0) + 7) / 8)"]
-    CalcB --> ResultB["<b>Result:</b> 0..15<br/>Non-negative only"]
+    CalcB --> ResultB["(only 0..15, non-negative)"]
     style Root fill:#f5f5f5,stroke:#333,stroke-width:2px
     style PathA fill:#f3e5f5,stroke:#7b1fa2
     style PathB fill:#e1f5ff,stroke:#0366d6
@@ -152,29 +135,28 @@ graph TD
     style ResultB fill:#e8f5e9,stroke:#2e7d32
 ```
 
-#### Path A: Accumulator update (internal state)
+**Path 1: To accumulator (primary, always active)**
 
 **Formula:**
-
 ```
-thr_cur16 += row_raw_signed[r]  // signed i16, no clamp
+thr_cur16 += row_raw_signed[r]  // signed i16, no transformations
 ```
 
 **Features:**
 
-- `row_raw_signed[r]` used **as is**, in full signed range [-840..+840]
+- `row_raw_signed[r] ∈ [-840..+840]` used **as is**, preserving sign
 - Sum over all 8 rows: `delta_raw ∈ [-6720..+6720]`
 - Accumulator `thr_cur16 ∈ [-32768..+32767]` (signed i16)
 
-**Physical meaning:** Inside the tile, **both signs** matter:
+**Why:**
 
-- Positive contributions = excitation
-- Negative contributions = inhibition
-- Balance determines whether thr_cur16 hits fuse range [thr_lo16..thr_hi16]
+- Accumulating activation for fuse decision (`thr_cur16 ∈ [thr_lo16..thr_hi16]`)
+- Applying decay (decay to zero)
+- Maintaining tile's internal state between clocks
 
-> *💭 Key point: Inhibition "lives" inside the tile, in the accumulator. It's invisible on VSB bus — only levels 0..15. This enables lateral inhibition without negative signals in external environment.*
+> *💭 **Physical meaning:** Accumulator is tile's "memory". It stores balance of excitation and inhibition, even if there's silence on the bus now.*
 
-#### Path B: Output to VSB bus (WRITE phase)
+**Path 2: To VSB bus (conditional, only with BUS_R in WRITE phase)**
 
 **Formula:**
 
@@ -210,7 +192,7 @@ row_raw_signed[r] = -100
 → clamp15(0) = 0  ← full suppression (inhibition won)
 ```
 
-**Physical meaning:** Only **energy levels** (0..15) go to VSB bus. Negative values make no sense for transmission — "silence" is encoded as 0.
+> *💭 **Physical meaning:** Only **energy levels** (0..15) go to VSB bus. Negative values make no sense for transmission — "silence" is encoded as 0.*
 
 **Why /8, not adaptive normalization?**
 
@@ -218,132 +200,79 @@ row_raw_signed[r] = -100
 
 This guarantees:
 
-| Criterion | Fixed shift >>3 | Adaptive normalization |
-|-----------|-----------------|------------------------|
-| Determinism | ✅ Always the same | ❌ Depends on input density |
-| Hardware cost | ✅ Bit shift (0 clocks) | ❌ Division in runtime |
-| Predictability | ✅ Easy to verify | ❌ Hard to debug |
+- Determinism: same configuration → same result
+- Hardware simplicity: `>>3` instead of division in runtime
+- Predictability: no "sudden saturation" with input density change
 
 If you need different dynamic range — tune tile parameters:
 
 - `weights` (mag3+sign1) — connection strength
-- `thr_lo/hi` — threshold sensitivity
+- `thr_lo/hi` — accumulator activation range
 - `decay16` — decay rate
 
-### 2.4 Accumulator + Signed Decay: Memory with inertia
+> *💭 Philosophy: Don't hide complexity in "smart architecture", give explicit control levers.*
 
-Each tile has an internal accumulator — its "memory", its state.
+### 2.4 Accumulator + Signed Decay: Memory with Inertia
 
-**Accumulator:**
+Tile state is stored in accumulator `thr_cur16`:
 
 ```
 thr_cur16 ∈ [-32768..+32767]  // signed i16
 ```
 
-**Why signed?** Because the tile must "remember" not only excitation, but also inhibition. Negative accumulator = "I'm suppressed, I need more signal to fire".
+**Why signed:** Accumulator sums weighted contributions `row_raw_signed[r] ∈ [-840..+840]`. Negative values (inhibition) must decrease potential, not cut off at zero.
 
-**Decay mechanism (decay to zero):**
+**Decay mechanism:**
 
-Each clock, the accumulator tends to zero if not fed. This is not "zeroing". It's **gradual decay**.
+On each clock, if decay16 > 0, accumulator tends to zero:
 
 ```
 if (decay16 > 0) {
-  if (thr_tmp > 0) thr_tmp = max(thr_tmp - decay16, 0)
-  else if (thr_tmp < 0) thr_tmp = min(thr_tmp + decay16, 0)
-  // ❗ Never jumps over 0!
+  if (thr_tmp > 0) thr_tmp = max(thr_tmp - decay16, 0);
+  else if (thr_tmp < 0) thr_tmp = min(thr_tmp + decay16, 0);
+  // Zero-crossing protection: sign doesn't change
 }
 ```
 
-**Examples (decay16 = 30):**
+**Key properties:**
 
-| Was | Became | Why |
-|-----|--------|-----|
-| +100 | +70 | 100 - 30 = 70 |
-| +20 | 0 | 20 - 30 = -10 → max(-10, 0) = 0 |
-| -20 | 0 | -20 + 30 = +10 → min(+10, 0) = 0 |
-| 0 | 0 | decay not applied to zero |
-
-⚠️ **Important:** Decay **never jumps over zero**. If accumulator was positive, it cannot become negative from decay (and vice versa). This is like friction: it slows motion, but doesn't change direction.
-
-**Physical meaning:**
-
-> *💭 Analogy: Imagine a ball in a pit. If you push it (+signal), it rolls uphill. But friction (decay) pulls it back to center (0). If no push — ball stops at center. It won't roll to the other side on its own.*
+1. **No zero jump.** If `thr_cur16 = +20` and `decay16 = 30`, result will be `0`, not `-10`. Potential sign is invariant relative to decay.
+2. **Always applied.** Decay works even for `locked` tiles. This allows active path to "cool down" and unlock without feed.
+3. **Configurable parameter.** `decay16` is set in `TileParams` individually for each tile.
 
 **Why this is needed:**
 
-1. **Natural "forgetting":** signal doesn't hang forever, decays if not fed.
-2. **Stability:** system doesn't saturate, self-balances.
-3. **Time integration window:** decay creates signal integration window. If two weak signals arrive close in time — they sum. If far apart — first decays before second arrives.
+- **Noise filtering:** Weak signals (`|delta| < decay16`) don't accumulate, they annihilate.
+- **Integration window limit:** Signals sum only if they arrive within time window set by decay rate.
+- **Stability:** Prevents accumulator saturation during long activation.
 
-> *💭 **Decay applies even to locked tiles** — this allows "cooling" active paths without unlocking them. Path can "cool down" and unlock if no feed.*
+> *Note: If task requires weak signal integration — set decay16 = 0 or small value. Architecture doesn't impose "forgetting", you control it through configuration.*
 
-**Why "sticky zero" is a feature?**
+### 2.5 Fuse-by-Range: Threshold Logic
 
-Decima-8 was designed for **pattern detection**, not weak signal accumulation.
-
-| Task | Solution in Decima-8 |
-|------|---------------------|
-| Noise filtering | decay16 > 0 (weak signals annihilate) |
-| Weak signal integration | decay16 = 0 or small value |
-| Time integration window | Configure thr_lo/hi + use domains |
-
-> Decay is a **configurable parameter**, not a fixed architectural limitation.
-
-### 2.5 Fuse-by-Range: Threshold logic
-
-Tile doesn't just compute. It **makes a decision** about locking. This is its "spike", but not binary — smart.
-
-**Lock condition:**
+Tile makes decision about locking based on current accumulator value `thr_cur16` and configurable range `[thr_lo16..thr_hi16]`:
 
 ```
 locked = 1, if thr_cur16 ∈ [thr_lo16, thr_hi16]
 ```
 
-**Thresholds:**
+**Parameters:**
 
-```
-thr_lo16 ∈ [-32768..+32767]  // signed i16
-thr_hi16 ∈ [-32768..+32767]  // signed i16
-```
+- `thr_lo16, thr_hi16` ∈ `[-32768..+32767]` (signed i16)
+- Validation: `if thr_lo16 > thr_hi16` → error `FuseRangeError` at bake
+- If `thr_lo16 == thr_hi16` → fuse disabled (tile never locks)
 
-**Threshold validation:**
+**Behavior at `locked=1`:**
 
-- If `thr_lo16 > thr_hi16` → validation error at bake (`FuseRangeError`)
-- This prevents undefined behavior and explicit configuration errors
+1. **Maintaining descendant activation:** while tile is locked, its descendants in graph remain `ACTIVE` and can compute in next clock.
+2. **Decay continues working:** accumulator decays to zero even in locked state. If `thr_cur16` exits [`thr_lo16..thr_hi16`] range, tile unlocks.
+3. **Relay propagates:** locked tile forms stable link in activation graph.
 
-**Key feature:** Range can be in **any part of signed spectrum**.
+**Key principle:**
 
-| Example | thr_lo16 | thr_hi16 | Range | Fires when |
-|---------|----------|----------|-------|------------|
-| Positive only | +100 | +500 | [+100..+500] | Strong excitation |
-| Negative only | -500 | -100 | [-500..-100] | Strong inhibition |
-| Crosses zero | -200 | +200 | [-200..+200] | Any deviation from rest |
-| Zero only | 0 | 0 | — | Fuse disabled! |
-| Full range | -32000 | +32000 | almost all i16 | Almost always locked |
+`locked` is not data transfer, but computation permission for descendants. Data comes from Conductor via `VSB_INGRESS`, not from other tiles. Tiles only accumulate state in accumulators and manage activation graph through `locked` flags.
 
-⚠️ **Important:** If `thr_lo16 == thr_hi16` (e.g., both = 0), fuse is **disabled** — such tile never latches. This is unbaked tile not participating in swarm fabric.
-
-**What happens at locked?**
-
-Here it's important to understand Decima-8 philosophy: tiles don't transfer data to each other. They form an activation graph (relay).
-
-**When tile is locked:**
-
-1. **It holds activation of its descendants** — while tile is locked, its children stay ACTIVE and can compute in next clock.
-2. **Accumulator continues decaying** — decay applies even to locked tiles. If no feed, accumulator "cools", exits [thr_lo16..thr_hi16] range, and tile unlocks.
-3. **Relay continues** — locked tile is a "node" in activation chain. While locked, signal can propagate further along graph.
-
-> *💭 Physical meaning: Locked is not "signal transfer". It's maintaining activation path. Like a bonfire: while logs burn (locked), fire can spread to neighboring logs (descendants). When logs burn out (decay exited range) — path extinguishes, descendants collapse.*
-
-**Why this matters:**
-
-| Wrong understanding | Correct understanding |
-|---------------------|----------------------|
-| "Locked tile transfers data to descendants" | "Locked tile keeps descendants ACTIVE" |
-| "Passthrough mode" | "Resonant activation path" |
-| "Copper bridge" | "Relay chain node" |
-
-**Data is not transferred between tiles.** Data comes from Conductor via VSB_INGRESS. Tiles only **accumulate** and **hold descendant activation** while locked.
+> *Note: Range [`thr_lo16..thr_hi16`] can be in any part of signed spectrum: only positive, only negative, or crossing zero. This allows tuning tile response to excitation, inhibition, or deviation from rest.*
 
 ---
 
@@ -358,15 +287,17 @@ Here it's important to understand Decima-8 philosophy: tiles don't transfer data
 | Accumulator | [-32768..+32767] | thr_cur16 += delta_raw - decay |
 | Fuse range | [-32768..+32767] | thr_lo16 .. thr_hi16 |
 
-**Everything deterministic. Everything fits fixed ranges. No overflow, no surprises.**
-
-Ready for architecture? It gets more interesting there.
-
 ---
 
-## 3. HARDWARE ARCHITECTURE
+## 3. ARCHITECTURE
 
-Mathematics is the soul. Architecture is the body. Now about how this works in hardware.
+Section 2 fixed mathematical computation rules. Section 3 describes their hardware implementation: Conductor/Island separation, deterministic READ→WRITE cycle, relay activation without routers, and energy efficiency mechanisms.
+
+All components designed to guarantee:
+
+- Fixed latency (doesn't depend on load)
+- Scalability (linear time growth with fabric growth)
+- Determinism (same result with same inputs)
 
 ---
 
@@ -406,45 +337,35 @@ graph TD
 
 *Conductor ↔ Island diagram*
 
-Decima-8 is divided into two planes:
+Decima-8 is divided into two planes: **Conductor** (control) and **Island** (computation).
 
-**Conductor:**
+**Conductor** — external controller (CPU/FPGA/PC):
 
-- Controls phases (EV_FLASH, EV_BAKE, EV_RESET_DOMAIN)
-- Loads weights via SPI-like interface (CFG)
-- Sets `VSB_INGRESS[0..7]` at READ start
-- Reads `BUS16[0..7]` after WRITE
-- Receives PATTERN_ID, commands actuators for its task
-- Resets tile domains as needed
+- Calls events `EV_FLASH`, `EV_BAKE`, `EV_RESET_DOMAIN`
+- Sets `VSB_INGRESS[0..7]` at READ phase start
+- Reads `BUS16[0..7]` and `PATTERN_ID` after WRITE phase
+- Loads configuration (weights, thresholds) via SPI-like interface (CFG)
 
-**Island:**
+**Island** — computational fabric:
 
-- Tile fabric (8×32, 16×32, 16x64, 32×64, 32x128 — scalable)
-- Parallel operation of all tiles
-- **VSB** (Value Signal Bus): 8 lanes Level16 (input from Conductor)
-- **BUS16**: 8 lanes for honest summing (output to Conductor)
-- **PATTERN_ID**: dedicated channel for pattern ID
-
-**Connection:**
-
-```
-Conductor → VSB_INGRESS → Island (READ phase)
-Island → BUS16 → Conductor (WRITE phase)
-```
+- Tile array (scalable: 8×32 .. 32×128)
+- Parallel processing of all tiles in each clock
+- **VSB** (Value Signal Bus): 8 input lines Level16 from Conductor
+- **BUS16:** 8 output lines for tile contribution summing
+- **PATTERN_ID:** dedicated channel for winning pattern ID
 
 **Configuration interfaces:**
 
-- **SPI / QSPI**: BakeBlob load (weights, thresholds) — up to 50 MB/s
-- **Parallel CFG bus** (for FPGA): up to 200 MB/s
-- **PCIe / Ethernet** (for host controller): up to 1 GB/s
+- SPI/QSPI: BakeBlob load — up to 50 MB/s
+- Parallel CFG bus (FPGA): up to 200 MB/s
+- PCIe/Ethernet (host controller): up to 1 GB/s
+- UART: debug only, not for runtime
 
-> UART mentioned only as debug interface, not for runtime weight updates.
-
-> ⚠️ **Important:** Conductor doesn't interfere with computation. It only conducts: "one-two, read-write". All magic happens in Island.
+> *💭 Principle: Conductor doesn't participate in computation. It only conducts the cycle and reads results. All dynamics happen inside Island.*
 
 ---
 
-### 3.2 Two-phase cycle
+### 3.2 Two-Phase Cycle
 
 ```mermaid
 gantt
@@ -472,16 +393,15 @@ gantt
     AutoReset (optional)      : 20, 22
 ```
 
-The entire fabric operates in strict rhythm. One clock = **20 μs** (*on i5-3550 emulator*).
+The entire fabric operates in strict rhythm. One clock consists of four phases:
 
 ```
 ┌─────────────┬──────────────┬─────────────┬─────────────┐
 │ PHASE_READ  │ TURNAROUND   │ PHASE_WRITE │ READOUT     │
-│ (0..8 μs)   │ (10..12 μs)  │ (12..18 μs) │ (18..20 μs) │
 └─────────────┴──────────────┴─────────────┴─────────────┘
 ```
 
-**PHASE_READ (0..8 μs):**
+**PHASE_READ:**
 
 1. Conductor sets `VSB_INGRESS16[0..7]` (Level16)
 2. All ACTIVE tiles sample input
@@ -491,37 +411,38 @@ The entire fabric operates in strict rhythm. One clock = **20 μs** (*on i5-3550
 6. Check fuse: `locked_after = (thr_cur16 ∈ [thr_lo16..thr_hi16])`
 7. Form `drive_vec[0..7]`
 
-**TURNAROUND (10..12 μs):**
+**TURNAROUND:**
 
 - Conductor releases VSB (Hi-Z / no-drive)
 - Island enables BUS16 drive
 - **Mandatory gap** — no direction races
 
-**PHASE_WRITE (12..18 μs):**
+**PHASE_WRITE:**
 
 - Tiles with `BUS_W==1` and `(locked self || locked_ancestor)` set `drive_vec` on BUS16
-- **Honest summing**: `BUS16[i] = clamp15(Σ contrib[i])`
+- Honest summing: `BUS16[i] = clamp15(Σ contrib[i])`
 - Latch: `locked := locked_after`
 
-**READOUT (18..20 μs):**
+**READOUT:**
 
 - Conductor reads `BUS16[0..7]` as clock result
 - Optional: AutoReset-by-Fire (domain reset by winner mask)
 
+**Cycle determinism:**
+
+Execution time of each clock is fixed and doesn't depend on:
+
+- Number of active tiles
+- Pattern complexity
+- Accumulator state
+
+On emulator (i5-3550) full cycle takes **~20-311 μs** depending on fabric size (see section 4). On FPGA/ASIC time will be determined by clock frequency and pipeline depth.
+
+> *💭 Key principle: regardless of whether tile activated or not, all computations take same number of clocks. This guarantees zero jitter at architecture level.*
+
 ---
 
-**Fixed latency:**
-
-Regardless of whether tile activated or not, **all computations take same number of clocks**:
-
-- READ: 8 μs (all tiles compute, even if ACTIVE=0)
-- WRITE: 6 μs (all tiles with BUS_W set data, even if drive_vec=0)
-
-> This guarantees **zero jitter** at emulator and ASIC level. Doesn't depend on pattern complexity. Determinism at clock level.
-
----
-
-### 3.3 Relay activation (Router-less NoC)
+### 3.3 Relay Activation (Router-less NoC)
 
 ```mermaid
 sequenceDiagram
@@ -547,18 +468,15 @@ sequenceDiagram
     Note over T1, T2: No packet routing. Only logical AND.
 ```
 
-**Problem of traditional NoC (Network-on-Chip):**
+In traditional neuromorphic architectures, tiles exchange data through packet-switching network (Network-on-Chip). This requires:
 
-| Metric | Value |
-|--------|-------|
-| Area for routers | ~40% of die |
-| Energy for routing | ~70% of budget |
-| Latency | Stochastic (arbitration, buffers) |
-| Jitter | Present |
+- Routers between nodes
+- Buffers for packet queues
+- Arbitration on traffic collisions
 
-**Decima-8 solution:**
+**Decima-8 works differently:**
 
-Tiles **don't transfer data** to each other. Instead, they form an **activation graph** via direction flags (N/E/S/W/NE/SE/SW/NW).
+Tiles **don't transfer data** to each other. Instead, they form **activation graph** via direction flags (N/E/S/W/NE/SE/SW/NW).
 
 **Mechanism:**
 
@@ -572,13 +490,14 @@ Computed as **least fixed point** — deterministically, in one pass.
 
 **Relay in action:**
 
-Clock N: root tile activates and fuses. Clock N+1: descendant sees locked_before[p]==1 and becomes ACTIVE.
+- **Clock N:** root tile activates and becomes `locked`.
+- **Clock N+1:** descendant sees locked_before[p]==1 and becomes ACTIVE
 
-> 💭 **Key:** Activation propagates in 2 clocks (ancestor → descendant). Data is not transferred — each tile reads only VSB_INGRESS from Conductor. Activation graph is **permission to compute**, not data transfer channel.
+> *💭 Key principle: activation propagates in 2 clocks (ancestor → descendant). Data is not transferred — each tile reads only `VSB_INGRESS` from Conductor. Activation graph is **computation permission**, not data transfer channel.*
 
 ---
 
-### 3.4 Branch collapse
+### 3.4 Branch Collapse
 
 **Logic:**
 
@@ -619,64 +538,43 @@ Branch collapsed.
 
 ### 3.5 Double Strait
 
-**Problem:** When recognizing patterns with small Hamming distance, "cross-activation" occurs.
+**Purpose:** Increase selectivity when recognizing patterns with small Hamming distance (e.g., ASCII characters encoded in 32 bits on 8 VSB strings).
 
-**Context:** Text is encoded to bits and fed to 8 VSB strings as 32-bit chord (8 lanes × 4 bits = 32 bits). Hamming distance between similar characters can be just 2-3 bits out of 32.
-
-**Example:**
-
-- Character "6" and character "3" in bit representation differ by 2-3 bits out of 32
-- Tile tuned to detect "6" may also fire on "3", "4", "2" (thr_cur16 hits [lo..hi] range)
-- Result: false positives, low selectivity
-
-> *⚠️ Important: most personalities (OCR, ASR, HFT) work fine without double strait. But if you need high selectivity for similar patterns — double strait is necessary.*
-
-**Solution: Double strait + antagonist tile**
+**Problem:** With direct detection, similar characters (e.g., "3" and "8") may activate same tiles due to bit mask overlap. This leads to false positives.
 
 **Mechanism:**
 
-**1. BAKE_FLAG_DOUBLE_STRAIT** (bit 0 in .d8p header):
+If flag `BAKE_FLAG_DOUBLE_STRAIT` is set (bit 0 in .d8p header), core performs two internal straits per one `EV_FLASH` call:
 
-- Conductor feeds input ONCE (not twice!)
-- Core internally runs two clocks
-- Decision output only after second strait
-- For Conductor this is one EV_FLASH, but execution time doubles (~40 μs instead of ~20 μs)
+**First Strait (Search):**
 
-**2. Detector tile:**
+- All tiles compute `row_raw_signed`, update `thr_cur16`.
+- Detector tiles (first line) latch (`locked=1`) if they hit [`thr_lo..thr_hi`] range.
+- No decision output. BUS16 output bus not updated.
 
-- Tuned to pattern "6" (thr_lo/hi tuned for activation on "6")
-- On double strait: thr_cur16 += delta (first clock) + thr_cur16 += delta (second clock)
-- Result: doubled activation, reliable firing
+**Second Strait (Verification):**
 
-**3. Antagonist tile:**
+- Same input chord processed again.
+- Latched detectors open path to antagonist tiles (through activation graph).
+- Antagonists verify pattern: only one antagonist (matching input character) keeps accumulator near zero. Others go deep negative (inhibition).
+- **Decision output:** only after second strait completes.
 
-- Tuned to deny similar pattern "NOT 3"
-- Uses negative weights for pattern "3"
-- On double strait: if input similar to "3" → thr_cur16 -= delta (inhibition)
-- If antagonist latched → decision output
+**For Conductor:**
 
-**Result:**
-
-| Scenario | Without double strait | With double strait |
-|----------|----------------------|--------------------|
-| Input "6", detector "6" | Fired (but may be false on "3") | Fired reliably (doubled activation) |
-| Input "3", detector "6" | False positive | Blocked by antagonist |
-| Input "6", antagonist "NOT 3" | Didn't fire | Confirmed purity |
+- One EV_FLASH call.
+- Execution time doubles (e.g., ~40 μs instead of ~20 μs on emulator).
+- API doesn't change: input fed once, result read after completion.
 
 **When to use:**
 
-- ✅ Similar pattern recognition (small Hamming distance)
-- ✅ Classification with class overlap (characters, digits, letters)
-- ✅ High accuracy more important than speed (2 clocks instead of 1)
-- ❌ Patterns well separated (large Hamming distance)
+- Yes: Character/digit recognition with small Hamming distance.
+- Yes: Classification with class overlap, where accuracy matters.
+- No: Tasks with strict latency requirements (HFT, motor control).
+- No: Patterns with large Hamming distance (single strait is enough).
 
-**In IDE:**
+**In IDE:** "Double Strait" checkbox in bake settings automatically sets flag in .d8p.
 
-- Checkbox "Double Strait" in bake settings
-- Automatically sets BAKE_FLAG_DOUBLE_STRAIT in .d8p header
-- Swarm switches to double feed mode
-
-> *💭 Philosophy: Double strait is not "slower", it's "more accurate". Like double exposure in photography: one frame may be blurred, two frames — clear image.*
+> *Note: Most personalities (ASR, motor control, simple detectors) work without double strait. This is optional mode for tasks where classification accuracy is priority over latency.*
 
 ---
 
@@ -688,13 +586,228 @@ Branch collapsed.
 | **Two-phase cycle** | READ → TURNAROUND → WRITE | Determinism 20 μs, no race conditions |
 | **Relay activation** | Graph, not data transfer | 0% area for routers, zero jitter |
 | **Branch collapse** | ACTIVE=false → reset to 0 | Energy efficiency, automatic optimization |
-
-**Ready for benchmarks?** We'll show that 20 μs is not marketing, but reality.
-
----
-
-[**Note:** This is an abridged translation covering sections 1-3 and key parts of section 3.5. The full English translation would continue with sections 4-9 following the same pattern, preserving all diagrams, tables, and technical details while adapting idioms and metaphors for English-speaking technical audience.]
+| **Double strait** | Two internal clocks per EV_FLASH | Selectivity over latency |
 
 ---
 
-**Bake the Future. Build the Substrate.** 🛠️⚡️
+## 4. BENCHMARKS
+
+### Test Platform
+
+**IDE Decima-8** — native C++23 application (libwui, static build). Tests on Intel Core i5-3550 (2012, 4 cores, 3.3 GHz), single core.
+
+**Measurement results:**
+
+| Tiles | Cycle Time | Frequency |
+|-------|------------|-----------|
+| 256 | ~22 μs | 45 kHz |
+| 512 | ~43 μs | 23 kHz |
+| 1024 | ~81 μs | 12 kHz |
+| 2048 | ~160 μs | 6 kHz |
+| 4096 | ~311 μs | 3 kHz |
+
+![graph](img/performance.svg)
+
+*Performance graph on i5-3550 (single core)*
+
+**Scaling:**
+
+When doubling tile count, execution time **approximately doubles** (factor 1.88–1.98). After 1024 tiles growth accelerates — cache misses and memory pressure take effect. This is **physical CPU limitation**, not algorithmic.
+
+> ***Important:** For each configuration time is constant and doesn't depend on network activity. 100% tile load doesn't increase latency.*
+
+**Memory:**
+
+Emulator uses ~57 bytes per tile. For 4096 tiles requires ~228 KB — fits in L2/L3 cache of modern CPU.
+
+**Determinism**
+
+Cycle time spread is minimal (± OS jitter). This is architecture consequence:
+
+- No dynamic allocations in runtime
+- No data-dependent branching
+- Fixed READ → WRITE cycle
+
+On FPGA/ASIC time will be determined by clock frequency and pipeline depth, not network load.
+
+**Application:**
+
+| Task | Requirements | Decima-8 (4096 tiles) |
+|------|--------------|----------------------|
+| Robotics | 1–10 ms cycle | 0.3 ms (margin 3–30×) |
+| HFT (analytics) | < 1 ms | 0.3 ms |
+| Audio processing (block processing) | 1-10 ms block | 0.3 ms (margin 3-30×) |
+
+> *Note: Decima-8 emulator (4096 tiles, ~311 μs) is suitable for predictive analytics in trading cycle and audio-DSP with block processing (64+ samples). Tasks with sub-millisecond requirements — direct order execution (tick-to-trade < 1 μs) or sample-by-sample processing (22.7 μs @44.1 kHz) — require FPGA/ASIC or smaller fabric configuration.*
+
+---
+
+## 🧩 Benchmarks Summary
+
+| Metric | Value |
+|--------|-------|
+| **Minimum latency** | 22 μs (256 tiles) |
+| **Maximum size** | 4096 tiles in 311 μs |
+| **Scaling** | Linear (O(n)) |
+| **Jitter** | Absent (determinism) |
+| **Memory** | Compact (L3 cache) |
+
+---
+
+## 5. SOFTWARE ECOSYSTEM
+
+Decima-8 is not just hardware. It's a set of tools for creating, testing, and running neuromorphic personalities.
+
+### 5.1 D8P Format
+
+**Status:** Open specification (MIT)
+
+File `.d8p` (Decima 8 Personality) is a container for swarm "personality". Contains no code. Only data.
+
+**Structure:** TLV (Type-Length-Value) with CRC32 checksum.
+
+**Why TLV:**
+
+- New block types don't break old parsers
+- Easy to check file integrity
+- No need to load entire file to memory for validation
+
+**libd8p** — open library (C++, MIT) for working with format: parsing, validation, generation.
+
+> *💭 Anyone can write their own .d8p generator: in Python (PyTorch/NumPy), Rust, C++, or even manually in hex editor.*
+
+### 5.2 IDE
+
+**Status:** Closed binary, free to use
+
+**Characteristics:**
+
+- Static build, no dependencies
+- Windows (MSVC 2026) / Linux (Clang latest)
+- Works offline, no internet required
+
+![Decima-8 IDE](img/ide1.png)
+
+*Decima-8 IDE overview*
+
+**Main components:**
+
+| Component | Description |
+|-----------|-------------|
+| **Swarm panel** | Visual representation of personality fabric (activation heatmap) |
+| **Tile parameters** | Weights, thr_lo/hi, decay, routing |
+| **16-chord accordion** | VSB visualizer (8 lanes × 16 chord history) |
+| **Tape recorder and network** | Load/save VBS tapes, receive/send VSB via UDP |
+| **Control panel** | Flash: run machine clock, Reset: reset domains, Autobake |
+| **Decision output panel** | Shows PATTERN_ID, BUS16, FLAGS |
+
+**Visual baking:** mouse-adjust thresholds, weights and connections, observing swarm response in real time.
+
+### 5.3 Core Emulator
+
+**Status:** *OPEN SOURCE* (MIT)
+
+Emulator is "source of truth" for math verification.
+
+**Purpose:**
+
+- Personality testing before FPGA/ASIC load
+- Integration in CI/CD, auto-tests
+- Studying architecture "from inside"
+
+**Functionality:**
+
+- Bit-accurate compatibility with hardware (emulator → FPGA → ASIC)
+- API: `EV_FLASH`, `EV_BAKE`, `EV_RESET_DOMAIN`
+- Read FLAGS, BUS16, statistics
+- C-API for Python/Rust/C++ integration
+
+**Usage example (Python):**
+
+```python
+import d8p
+
+swarm = d8p.load("personality.d8p")
+
+for i in range(1000):
+    swarm.ev_flash(vsb_ingress=[7,12,3,10,4,14,0,9])
+    readout = swarm.read_bus()
+    print(f"Tick {i}: BUS16 = {readout}")
+```
+
+### 5.4 Store (Personality Marketplace)
+
+**Status:** Curated platform
+
+Store is a place for publishing and sharing ready personalities.
+
+**Workflow:**
+
+1. **Generate .d8p** — by any means (IDE, script, neural network)
+2. **Sign with PKI key** — authorship and integrity guarantee
+3. **Publish in Store** — specification validation + signature check
+4. **Community use** — download, integration, reviews, monetization
+
+**Publication requirements:**
+
+- Valid .d8p (specification compliance)
+- PKI signature (obtained via Tile/Cluster/Council subscription)
+- Minimal frontend (Conductor code for running)
+- Documentation (inputs/outputs description)
+
+> *💭 Store doesn't check Conductor code (author's responsibility), but checks `.d8p` for spec compliance and signature validity.*
+
+**Why PKI signature?**
+
+This is not paywall, but trust chain:
+
+- Guarantee that personality created by verified author
+- Protection from file substitution
+- Reputation system (reviews, author ratings)
+
+Already published personalities **are not deleted** on subscription expiration.
+
+## 🧩 Ecosystem Summary
+
+| Component | Status | Purpose |
+|-----------|--------|---------|
+| Format .d8p | ✅ OPEN | Personality container |
+| libd8p | ✅ OPEN | Parsing, validation, generation |
+| Emulator | ✅ OPEN | Testing, verification |
+| IDE | 🔒 CLOSED (Free) | Visual tuning |
+| Store | 🔒 CLOSED (Curated) | Publishing and sharing |
+
+**Open core, closed cockpit.** You can create `.d8p` any way, but PKI signature needed for Store publication.
+
+---
+
+## 6. SECURITY
+
+Decima-8 doesn't make system "invulnerable". It makes risks predictable and localized.
+
+**Architectural risk model**
+
+| Component | Risk | Protection |
+|-----------|------|------------|
+| .d8p | ❌ None | Data (TLV), no code, no pointers |
+| Emulator (core) | ❌ None | Determinism, bounded arithmetic, saturate |
+| Personality frontend | ⚠️ Yes | Sandbox, limits, author reputation |
+| Conductor (your code) | ⚠️ Yes | Classic security practices |
+
+**.d8p is data, not program**. Contains no executable code, no `eval`, no recursion. File cannot execute RCE, overflow stack, or allocate memory.
+
+**Emulator is deterministic machine**. Fixed clocks, Level16, clamp-arithmetic. "Bad" data doesn't exist — only values 0..15. Overflow impossible by design.
+
+**Frontend and Conductor** — your responsibility. Code that transforms external data to Level16 and reads BUS16, works with network, FS, JSON. Classic vulnerabilities apply here (parsing, buffers, network).
+
+> **Principle:** Core is clean. Perimeter is yours.
+
+**Topology validation**
+
+Besides CRC32 and PKI signature, emulator performs static graph analysis before load:
+
+- Check for positive feedback loops
+- Limit on maximum tile connectivity degree
+- Limit on total gain coefficient in component
+
+If graph fails validation — load rejected with `Top
