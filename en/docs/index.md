@@ -14,13 +14,13 @@
 
 ## 🔗 Documents
 
-[MAIN CODEX](codex/index.md)
+[📜 MAIN CODEX](codex/index.md)
  
-[BAKE TOOL](tools/ide.md)
+[👩‍🍳 BAKE TOOL](tools/ide.md)
 
-[MASHINE SPEC](codex/index.md)
+[⚙️ MASHINE SPEC](codex/index.md)
 
-[GITHUB](https://github.com/rulerom/decima8)
+[</> GITHUB](https://github.com/rulerom/decima8)
 
 CONTACT: <vsb@decima8.org>
 
