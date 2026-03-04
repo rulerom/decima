@@ -16,11 +16,13 @@
 
 [MAIN CODEX](codex/index.md)
  
-[MAIN TOOL ](tools/ide.md)
+[BAKE TOOL](tools/ide.md)
+
+[MASHINE SPEC](codex/index.md)
 
 [GITHUB](https://github.com/rulerom/decima8)
 
-CONTACT: vsb@decima8.org
+CONTACT: <vsb@decima8.org>
 
 ---
 
