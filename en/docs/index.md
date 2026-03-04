@@ -10,7 +10,7 @@
 
 ## 📖 Overview
 
-**DECIMA-8** is a neuromorphic engine architecture with deterministic rhythm and programmable tile fabric.
+**DECIMA-8** is a neuromorphic architecture operating on energy levels with a deterministic rhythm and cascaded activation
 
 ## 🔗 Documents
 
