@@ -25,9 +25,13 @@
 
 ### Бинарные Файлы
 
-[IDE для Windows](https://decima.rulerom.com/d8_ide.exe)
+[IDE для Windows](d8_ide.exe)
 
-SHA256: `2DEB0072E3F6269BA1D1B36A2BF9784D99674165A89550B569796FADA7DAC0B9`
+SHA256: `88312735a2647986dc9de1ee9778e4cc88d2e637`
+
+[IDE для Linux](d8_ide)
+
+SHA256: `d6f49f6e7ee48d6e9a4576d1e6ecaaa41664610e`
 
 ---
 

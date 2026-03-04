@@ -15,6 +15,16 @@
 
 ## 📥 下载
 
+### 二进制文件
+
+[适用于 Windows 的 IDE](d8_ide.exe)
+
+SHA256: `88312735a2647986dc9de1ee9778e4cc88d2e637`
+
+[Linux 集成开发环境](d8_ide)
+
+SHA256: `d6f49f6e7ee48d6e9a4576d1e6ecaaa41664610e`
+
 ### 系统要求
 
 | 要求 | 值 |

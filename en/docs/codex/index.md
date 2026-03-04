@@ -39,6 +39,14 @@ Modern neuromorphic systems face two independent problems.
 
 ---
 
+![OCR Demo](img/ocr_demo1.gif)
+
+**Decima-8 IDE with OCR personality**
+
+[Download IDE](../tools/ide.md)
+
+---
+
 ## 2. MATHEMATICAL FOUNDATIONS
 
 Decima-8 architecture is based on deterministic integer arithmetic. This section provides computation specifications: data formats, activation formulas, and tile logic. All values have fixed ranges, guaranteeing reproducible results on any hardware.

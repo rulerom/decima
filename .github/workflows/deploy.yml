@@ -40,6 +40,9 @@ jobs:
         run: |
           mkdir -p site
           cp index.html site/index.html
+          cp ai-plugin.json site/ai-plugin.json
+          cp llms.txt site/llms.txt
+          cp README.md site/README.md
 
       - name: Sync to S3
         uses: jakejarvis/s3-sync-action@master

@@ -15,12 +15,24 @@
 
 ## 📥 Download
 
+### Binary files
+
+[IDE for Windows](d8_ide.exe)
+
+SHA256: `88312735a2647986dc9de1ee9778e4cc88d2e637`
+
+[IDE for Linux](d8_ide)
+
+SHA256: `d6f49f6e7ee48d6e9a4576d1e6ecaaa41664610e`
+
+---
+
 ### System Requirements
 
 | Requirement | Value |
 |-------------|-------|
 | **OS** | Windows 10/11, Linux (Ubuntu 20.04+) |
-| **Memory** | 8 GB RAM minimum |
+| **Memory** | 8 MB RAM minimum |
 | **Disk** | 2 MB free space |
 
 ### Binary Files

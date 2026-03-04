@@ -39,6 +39,14 @@
 
 ---
 
+![OCR Demo](img/ocr_demo1.gif)
+
+**Decima-8 IDE 具备 OCR 功能**
+
+[Download IDE](../tools/ide.md)
+
+---
+
 ## 2. 数学基础
 
 Decima-8 架构基于确定性整数算术。本节提供计算规范：数据格式、激活公式和图块逻辑。所有值都有固定范围，保证在任何硬件上可重复结果。
