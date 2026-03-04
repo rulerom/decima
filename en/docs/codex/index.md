@@ -125,7 +125,10 @@ Result `row_raw_signed[r]` goes to accumulator (always) and to bus (if BUS_R fla
 
 ### 2.3 Activation Function: Two Paths of One Signal
 
-After computing `row_raw_signed[r]`, the signal goes along two paths. **Path to accumulator is primary**, path to bus is conditional.
+The calculated `row_raw_signed[r]` contribution serves two purposes:
+
+- **Inward:** shifts the accumulator level (tile state)
+- **Outward:** generates a signal on the bus (tile output)
 
 ```mermaid
 graph TD
