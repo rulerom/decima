@@ -132,7 +132,7 @@ The weighted input `row_raw_signed[r]` works like a water flow:
 
 **The tile's output is not the tank level**. It is an input signal passed through a state-controlled valve.
 
-> *💡 Physical meaning: first, the float responds to flow (READ), then the valve opens or closes (WRITE). Logical meaning: a single computation serves both the state and the decision.*
+> *💭 Physical meaning: first, the float responds to flow (READ), then the valve opens or closes (WRITE). Logical meaning: a single computation serves both the state and the decision.*
 
 ```mermaid
 graph TD
