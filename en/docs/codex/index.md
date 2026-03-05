@@ -123,12 +123,16 @@ This is a compromise between precision and packing density: 64 weights × 5 bits
 
 Result `row_raw_signed[r]` goes to accumulator (always) and to bus (if BUS_R flag is set).
 
-### 2.3 Activation Function: Two Paths of One Signal
+## 2.3 Activation Function: Float and Faucet
 
-The calculated `row_raw_signed[r]` contribution serves two purposes:
+The weighted input row_raw_signed[r] works like a water flow:
 
-- **Inward:** shifts the accumulator level (tile state)
-- **Outward:** generates a signal on the bus (tile output)
+1. Raises the float in the tank (thr_cur16 += delta) – this is the tile's state.
+2. Goes to the output valve – but only if the float in the [thr_lo..thr_hi] zone has raised its lever (locked=1).
+
+**The tile's output is not the tank level**. It is an input signal passed through a state-controlled valve.
+
+> *💡 Physical meaning: first, the float responds to flow (READ), then the valve opens or closes (WRITE). Logical meaning: a single computation serves both the state and the decision.*
 
 ```mermaid
 graph TD
