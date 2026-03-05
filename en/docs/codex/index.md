@@ -125,10 +125,10 @@ Result `row_raw_signed[r]` goes to accumulator (always) and to bus (if BUS_R fla
 
 ## 2.3 Activation Function: Float and Faucet
 
-The weighted input row_raw_signed[r] works like a water flow:
+The weighted input `row_raw_signed[r]` works like a water flow:
 
-1. Raises the float in the tank (thr_cur16 += delta) – this is the tile's state.
-2. Goes to the output valve – but only if the float in the [thr_lo..thr_hi] zone has raised its lever (locked=1).
+1. Raises the float in the tank (`thr_cur16 += delta`) – this is the tile's state.
+2. Goes to the output valve – but only if the float in the [`thr_lo..thr_hi`] zone has raised its lever (`locked=1`).
 
 **The tile's output is not the tank level**. It is an input signal passed through a state-controlled valve.
 
