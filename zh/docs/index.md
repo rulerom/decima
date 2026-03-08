@@ -18,7 +18,7 @@
  
 [👩‍🍳 烘焙工具](tools/ide.md)
 
-[⚙️ 机器规格](CONTRACT/index.md)
+[⚙️ 机器规格](CONTRACT.md)
 
 [</> GITHUB](https://github.com/rulerom/decima8)
 

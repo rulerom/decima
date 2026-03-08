@@ -16,7 +16,7 @@
  
 [👩‍🍳 ПЕКАРНЯ](tools/ide.md)
 
-[⚙️ СПЕЦИФИКАЦИЯ](CONTRACT/index.md)
+[⚙️ СПЕЦИФИКАЦИЯ](CONTRACT.md)
 
 [</> КОД](https://github.com/rulerom/decima8)
 
