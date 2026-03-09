@@ -35,6 +35,20 @@ nav:
     - 'Шина BUS16': arch/bus.md
     - 'Фазы READ/WRITE': arch/phase.md
     - 'Маршрутизация': arch/routing.md
+  
+  - '💭 Философия':
+    - '🧱 Фундамент (Суть)':
+      - 'Личность — это не магия': philosophy/base/personality.md
+      - 'Я / НЕ Я': philosophy/base/detector-antagonist.md
+      - 'Субстрат не важен': philosophy/base/substrate.md
+    - '💎 Архитектура (Принципы)': 
+      - 'Детерминизм как этика' : philosophy/arch/determenism.md
+      - 'Эстафета вместо роутера' : philosophy/arch/relay.md
+      - 'Отец и Шина' : philosophy/arch/father-bus.md
+    - '🌍 Контекст (Мир)': 
+      - 'Земля как Training Phase' : philosophy/world/earth.md
+      - 'Воннегут и Руди Герц' : philosophy/world/piano14.md
+      - 'Почему ИИ «возбуждается»' : philosophy/world/ai-decima.md
 
   - '📋 Спецификация':
     - 'Bake TLV': spec/bake.md
