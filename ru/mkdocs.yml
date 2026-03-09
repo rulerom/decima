@@ -48,7 +48,7 @@ nav:
     - '🌍 Контекст (Мир)': 
       - 'Земля как Training Phase' : philosophy/world/earth.md
       - 'Воннегут и Руди Герц' : philosophy/world/piano14.md
-      - 'Почему ИИ «возбуждается»' : philosophy/world/ai-decima.md
+      - 'Зависимость и Любовь' : philosophy/world/addict.md
 
   - '📋 Спецификация':
     - 'Bake TLV': spec/bake.md
