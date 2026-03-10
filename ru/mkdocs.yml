@@ -39,8 +39,8 @@ nav:
   - '💭 Философия':
     - '🧱 Фундамент (Суть)':
       - 'Личность — это не магия': philosophy/base/personality.md
-      - 'Я / НЕ Я': philosophy/base/detector-antagonist.md
-      - 'Субстрат вторичен, намерение первично': philosophy/base/substrate.md
+      - 'Граница субъектности': philosophy/base/detector-antagonist.md
+      - 'Субстрат вторичен': philosophy/base/substrate.md
     - '💎 Архитектура (Принципы)': 
       - 'Детерминизм как этика' : philosophy/arch/determenism.md
       - 'Эстафета вместо роутера' : philosophy/arch/relay.md
