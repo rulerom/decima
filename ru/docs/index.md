@@ -26,7 +26,7 @@
 
 ---
 
-CONTACT: <vsb@decima8.org>
+📧 CONTACT: [vsb@decima8.org](mailto:vsb@decima8.org)
 
 ---
 
