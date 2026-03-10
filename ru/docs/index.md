@@ -16,14 +16,18 @@
  
 [👩‍🍳 ПЕКАРНЯ](tools/ide.md)
 
-[💭 ФИЛОСОФИЯ](base/personality.md)
+[💭 ФИЛОСОФИЯ](philosophy/base/personality.md)
 
 [⚙️ СПЕЦИФИКАЦИЯ](CONTRACT.md)
 
 [</> КОД](https://github.com/rulerom/decima8)
 
+[🐝 SWARM](https://intent-garden.org)
+
+---
+
 CONTACT: <vsb@decima8.org>
 
 ---
 
-**Bake the Future. Build the Substrate.** 🛠️⚡️
+**Пропекам будущее. Строим субстрат.** 🛠️⚡️
