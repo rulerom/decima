@@ -40,7 +40,7 @@ nav:
     - '🧱 Фундамент (Суть)':
       - 'Личность — это не магия': philosophy/base/personality.md
       - 'Я / НЕ Я': philosophy/base/detector-antagonist.md
-      - 'Субстрат не важен': philosophy/base/substrate.md
+      - 'Субстрат вторичен, намерение первично': philosophy/base/substrate.md
     - '💎 Архитектура (Принципы)': 
       - 'Детерминизм как этика' : philosophy/arch/determenism.md
       - 'Эстафета вместо роутера' : philosophy/arch/relay.md
@@ -50,7 +50,8 @@ nav:
       - 'Воннегут и Руди Герц' : philosophy/world/piano14.md
       - 'Зависимость и Любовь' : philosophy/world/addict.md
     - '🏠 Номос (Организация)': 
-      - 'Архитектурный манифест' : philosophy/nomos/about.md
+      - 'Архитектурный Манифест' : philosophy/nomos/about.md
+      - 'Архитектурное Управление' : philosophy/nomos/control.md
   - '📋 Спецификация':
     - 'Bake TLV': spec/bake.md
     - 'Протокол': spec/protocol.md

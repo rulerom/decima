@@ -173,4 +173,4 @@ void hft_trading(const D8PFile* master_trader, MarketData* data) {
 
 - [Зависимость и Любовь](addict.md)
 - [Земля как Training Phase: теодицея в архитектуре](earth.md)
-- [Субстрат не важен](../base/substrate.md)
+- [Субстрат вторичен, намерение первично](../base/substrate.md)

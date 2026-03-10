@@ -78,6 +78,6 @@ if (activation > thr_hi) {
 
 ## Читать дальше
 
-- [Субстрат не важен](substrate.md)
+- [Субстрат вторичен, намерение первично](substrate.md)
 - [Детерминизм как этика](../arch/determenism.md)
 - [Отец и Шина: контроль vs данные](../arch/father-bus.md)
