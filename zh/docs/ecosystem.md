@@ -1,72 +1,37 @@
-# 🌿 DECIMA 生态系统
+---
+title: "rulerom.com — 独立项目生态系统"
+description: "由哲学统一的独立项目目录：decima, philo, audrey, c-safe, bakery, pki"
+date: 2026-03-15
+tags: [生态系统，项目，主权，验证]
+lang: zh
+---
 
-> **神经形态引擎及其环境**
+# rulerom.com :: 由哲学统一的独立项目目录：
+
+«Theodicy in code. Suffering = gradient.»
+
+每个项目都是独立的。所有项目都是可验证的。整个生态系统是开放的。
 
 ---
 
-## 🧠 DECIMA-8
+**🗺️ 架构：Hub → Project → Depth**
 
-**神经形态引擎 (仿真器/FPGA/ASIC)**
-
-- 用于神经形态计算的确定性节奏
-- 8 条数据线路上的 Level16 (0..15)
-- 图块 = 最小可编程实体
-- 具有诚实累加的 BUS16 (8 lane)
-- 通过邻居的激活图
-- 范围熔丝 [thr_lo16..thr_hi16]
-- Decay-to-zero (拉向 0，永不跳过)
-
-**文档：** [decima.rulerom.com](https://decima.rulerom.com)
+- [rulerom.com](https://rulerom.com/zh/) (Hub)
+- [decima.rulerom.com](https://decima.rulerom.com/zh/) → 神经形态架构、IDE、基准测试
+- [philo.rulerom.com](https://philo.rulerom.com/zh/) → 哲学：主体性走廊、接力、神正论
+- [audrey.rulerom.com](https://audrey.rulerom.com/zh/) → 真空基底上的音频实验
+- [c-safe.rulerom.com](https://c-safe.rulerom.com/zh/) → 安全：验证、审计、独立栈
+- [bakery.rulerom.com](https://bakery.rulerom.com/zh/) → 烘焙工具：全球最佳烘焙实践
+- [pki.rulerom.com](https://pki.rulerom.com/zh/) → 签名基础设施：Ed25519、验证、注册表
 
 ---
 
-## 🛠️ DECIMA IDE
+## 原则：
 
-**用于烘焙个性的可视化环境**
-
-- 配置图块、权重、阈值
-- 实时集群可视化
-- 在模式下自动烘焙
-- 通过 EV_FLASH 识别
+- 一个项目 = 一个子域名 = 清晰的边界
+- 独立部署、独立文档
+- 统一的哲学、统一的验证标准
 
 ---
 
-## 🏛️ Swarm Council
-
-**集群核心中的 16 位长老，全球理事会中的 256 位实业家**
-
-- 域 0..15 = 长老
-- 碰撞时的优先级
-- AutoReset-by-Fire
-
-**网站：** [intent-garden.org/swarm.html](https://intent-garden.org/swarm.html)
-
----
-
-## 🧬 Personality Lab
-
-**神经形态个性烘焙坊**
-
-用于发布和货币化作者创建个性的平台。
-
-**网站：** [intent-garden.org/bakery.html](https://intent-garden.org/bakery.html)
-
----
-
-## 🔗 相关项目
-
-| 项目 | 描述 | URL |
-|------|------|-----|
-| **Intent-Garden** | 确定性 C/C++ 代码验证引擎 | https://intent-garden.org |
-| **Rule-Rom** | 全球意图库 | https://rulerom.com |
-| **LibWUI** | 工业 C++ 的高性能工具 | — |
-
----
-
-## 📧 联系方式
-
-**Email:** vsb@decima8.org
-
----
-
-**Bake the Future. Build the Substrate.** 🛠️⚡️
+## Founded by [🌿 Intent Garden Org](https://intent-garden.org/main_zh/)

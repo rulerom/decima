@@ -16,13 +16,13 @@
  
 [👩‍🍳 ПЕКАРНЯ](tools/ide.md)
 
-[💭 ФИЛОСОФИЯ](philosophy/base/personality.md)
-
 [⚙️ СПЕЦИФИКАЦИЯ](CONTRACT.md)
+
+[💭 ФИЛОСОФИЯ](https://philo.rulerom.com/ru/)
 
 [</> КОД](https://github.com/rulerom/decima8)
 
-[🐝 SWARM](https://intent-garden.org)
+[🐝 SWARM](https://intent-garden.org/main_ru/)
 
 ---
 

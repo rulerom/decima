@@ -20,7 +20,11 @@
 
 [⚙️ 机器规格](CONTRACT.md)
 
-[</> GITHUB](https://github.com/rulerom/decima8)
+[💭 哲学](https://philo.rulerom.com/zh/)
+
+[</> 代码](https://github.com/rulerom/decima8)
+
+[🐝 蜂群](https://intent-garden.org/main_zh/)
 
 CONTACT: <vsb@decima8.org>
 

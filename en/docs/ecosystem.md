@@ -1,72 +1,37 @@
-# 🌿 Decima Ecosystem
+---
+title: "rulerom.com — Ecosystem of Sovereign Projects"
+description: "Catalog of sovereign projects: decima, philo, audrey, c-safe, bakery, pki"
+date: 2026-03-15
+tags: [ecosystem, projects, sovereignty, verification]
+lang: en
+---
 
-> **Neuromorphic engine and surroundings**
+# rulerom.com :: catalog of sovereign projects united by philosophy:
+
+«Theodicy in code. Suffering = gradient.»
+
+Each project is independent. All projects are verifiable. The entire ecosystem is open.
 
 ---
 
-## 🧠 Decima-8
+**🗺️ Architecture: Hub → Project → Depth**
 
-**Neuromorphic engine (emulator/FPGA/ASIC)**
-
-- Deterministic rhythm for neuromorphic computing
-- Level16 (0..15) on 8 data lanes
-- Tile = minimal programmable entity
-- BUS16 (8 lane) with honest summing
-- Activation graph through neighbors
-- Range fuse [thr_lo16..thr_hi16]
-- Decay-to-zero (pulls to 0, never jumps over)
-
-**Documentation:** [decima.rulerom.com](https://decima.rulerom.com)
+- [rulerom.com](https://rulerom.com/en/) (Hub)
+- [decima.rulerom.com](https://decima.rulerom.com/en/) → Neuromorphic architecture, IDE, benchmarks
+- [philo.rulerom.com](https://philo.rulerom.com/en/) → Philosophy: corridor of subjectivity, relay, theodicy
+- [audrey.rulerom.com](https://audrey.rulerom.com/en/) → Audio experiments on vacuum substrate
+- [c-safe.rulerom.com](https://c-safe.rulerom.com/en/) → Security: verification, audit, sovereign stack
+- [bakery.rulerom.com](https://bakery.rulerom.com/en/) → Baking tools: best practices from world bakeries
+- [pki.rulerom.com](https://pki.rulerom.com/en/) → Signature infrastructure: Ed25519, verification, registry
 
 ---
 
-## 🛠️ Decima IDE
+## Principle:
 
-**Visual environment for baking personalities**
-
-- Configure tiles, weights, thresholds
-- Real-time swarm visualization
-- Auto-Bake under pattern
-- Recognition via EV_FLASH
+- One project = one subdomain = clear boundaries
+- Independent deploy, independent documentation
+- Unified philosophy, unified verification standard
 
 ---
 
-## 🏛️ Swarm Council
-
-**16 elders in swarm core, 256 industrialists in global council**
-
-- Domains 0..15 = elders
-- Priority on collision
-- AutoReset-by-Fire
-
-**Website:** [intent-garden.org/swarm.html](https://intent-garden.org/swarm.html)
-
----
-
-## 🧬 Personality Lab
-
-**Neuromorphic personality bakery**
-
-Platform for publishing and monetizing author-created personalities.
-
-**Website:** [intent-garden.org/bakery.html](https://intent-garden.org/bakery.html)
-
----
-
-## 🔗 Related Projects
-
-| Project | Description | URL |
-|---------|-------------|-----|
-| **Intent-Garden** | Deterministic C/C++ code verification engine | [c-safe.rulerom.com](https://c-safe.rulerom.com) |
-| **Rule-Rom** | Global library of intentions | [rulerom.com](https://rulerom.com) |
-| **LibWUI** | High-performance tools for industrial C++ | [libwui.org](https://libwui.org) |
-
----
-
-## 📧 Contact
-
-**Email:** vsb@decima8.org
-
----
-
-**Bake the Future. Build the Substrate.** 🛠️⚡️
+## Founded by [🌿 Intent Garden Org](https://intent-garden.org/main/)

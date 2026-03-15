@@ -1,72 +1,37 @@
-# 🌿 Экосистема Decima
+---
+title: "rulerom.com — Экосистема суверенных проектов"
+description: "Каталог суверенных проектов: decima, philo, audrey, c-safe, bakery, pki"
+date: 2026-03-15
+tags: [экосистема, проекты, суверенитет, проверка, верификация]
+lang: ru
+---
 
-> **Нейроморфный движок и окружение**
+# rulerom.com :: каталог суверенных проектов, объединённых философией:
+
+«Theodicy in code. Suffering = gradient.»
+
+Каждый проект — самостоятелен. Все проекты — верифицируемы. Вся экосистема — открыта.
 
 ---
 
-## 🧠 Decima-8
+**🗺️ Архитектура: Hub → Project → Depth**
 
-**Нейроморфный движок (эмулятор/FPGA/ASIC)**
-
-- Детерминированный ритм для нейроморфных вычислений
-- Level16 (0..15) на 8 линиях данных
-- Tile = минимальная программируемая сущность
-- BUS16 (8 lane) с честным суммированием
-- Граф активации через соседей
-- Фьюз по диапазону [thr_lo16..thr_hi16]
-- Decay-to-zero (тянет к 0, не перескакивая)
-
-**Документация:** [decima.rulerom.com](https://decima.rulerom.com)
+- [rulerom.com](https://rulerom.com/ru/) (Hub)
+- [decima.rulerom.com](https://decima.rulerom.com/ru/) → Нейроморфная архитектура, IDE, бенчмарки
+- [philo.rulerom.com](https://philo.rulerom.com/ru/) → Философия: коридор субъектности, эстафета, теодицея
+- [audrey.rulerom.com](https://audrey.rulerom.com/ru/) → Аудио-эксперименты на вакуумном субстрате
+- [c-safe.rulerom.com](https://c-safe.rulerom.com/ru/) → Безопасность: верификация, аудит, суверенный стек
+- [bakery.rulerom.com](https://bakery.rulerom.com/ru/) → Инструменты пропечки: лучшие практики мировых пекарен
+- [pki.rulerom.com](https://pki.rulerom.com/ru/) → Инфраструктура подписей: Ed25519, верификация, реестр
 
 ---
 
-## 🛠️ Decima IDE
+## Принцип:
 
-**Визуальная среда для пропекания личностей**
-
-- Настройка тайлов, весов, порогов
-- Визуализация сварма в реальном времени
-- Auto-Bake под паттерн
-- Распознавание через EV_FLASH
+- Один проект = один поддомен = чёткие границы
+- Независимый деплой, независимая документация
+- Единая философия, единый стандарт верификации
 
 ---
 
-## 🏛️ Swarm Council
-
-**16 старейшин в ядре сварма, 256 промышленников в глобальном совете**
-
-- Домены 0..15 = старейшины
-- Приоритет при коллизии
-- AutoReset-by-Fire
-
-**Сайт:** [intent-garden.org/swarm.html](https://intent-garden.org/swarm.html)
-
----
-
-## 🧬 Personality Lab
-
-**Пекарня нейроморфных личностей**
-
-Площадка для публикации и монетизации создаваемых авторами персоналий.
-
-**Сайт:** [intent-garden.org/bakery.html](https://intent-garden.org/bakery.html)
-
----
-
-## 🔗 Связанные Проекты
-
-| Проект | Описание | URL |
-|--------|----------|-----|
-| **Intent-Garden** | Детерминированный движок верификации C/C++ кода | [c-safe.rulerom.com](https://c-safe.rulerom.com) |
-| **Rule-Rom** | Глобальная библиотека намерений | [rulerom.com](https://rulerom.com) |
-| **LibWUI** | Высокопроизводительные инструменты для промышленного C++ | [libwui.org](https://libwui.org) |
-
----
-
-## 📧 Контакты
-
-**Email:** vsb@decima8.org
-
----
-
-**Bake the Future. Build the Substrate.** 🛠️⚡️
+## Founded by [🌿 Intent Garden Org](https://intent-garden.org/main_ru/)

@@ -20,7 +20,11 @@
 
 [⚙️ MASHINE SPEC](CONTRACT.md)
 
-[</> GITHUB](https://github.com/rulerom/decima8)
+[💭 PHILOSOPHY](https://philo.rulerom.com/en/)
+
+[</> CODE](https://github.com/rulerom/decima8)
+
+[🐝 SWARM](https://intent-garden.org/main/)
 
 CONTACT: <vsb@decima8.org>
 
