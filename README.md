@@ -1,4 +1,4 @@
-# DECIMA-8 🧠 — Neuromorphic Engine
+# DECIMA-8 🐉 — Neuromorphic Engine
 
 **Deterministic rhythm for neuromorphic computing: Emulator → Proto (PCB) → FPGA → ASIC**
 

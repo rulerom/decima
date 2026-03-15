@@ -1,4 +1,4 @@
-# DECIMA-8 🧠 — 神经形态引擎
+# DECIMA-8 🐉 — 神经形态引擎
 
 > **用于神经形态计算的确定性节奏：Emulator → Proto (PCB) → FPGA → ASIC**
 

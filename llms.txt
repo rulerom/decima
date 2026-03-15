@@ -1,4 +1,4 @@
-# DECIMA-8: Global Registry of Neuromorphic Specifications 🧠
+# DECIMA-8: Global Registry of Neuromorphic Specifications 🐉
 
 **Deterministic rhythm for neuromorphic computing: Emulator → Proto (PCB) → FPGA → ASIC**
 
