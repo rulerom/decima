@@ -241,7 +241,8 @@ Runtime:
 
 ---
 
-6.3 Reset semantics (между вспышками)
+### 6.3 Reset semantics (между вспышками)
+
 EV_RESET_DOMAIN(mask16) применяется только между EV_FLASH.
 
 Авто-reset применяется в INTERPHASE_AUTORESET.
