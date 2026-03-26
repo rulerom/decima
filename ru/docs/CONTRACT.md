@@ -1,13 +1,15 @@
-DECIMA-8 Resonance Swarm Contract v0.2 (Activation Graph + Range Fuse + Decay-to-Zero)
+# DECIMA-8 Resonance Swarm Contract v0.2 (Activation Graph + Range Fuse + Decay-to-Zero)
+
 Codename: Siberian Tank Interface
 
-Status: v0.2 DESIGN FREEZE
+*Status: v0.2 DESIGN FREEZE*
 
 Owner: Conductor (Digital Island) ↔ Swarm/Island (Analog Core)
 
 ---
 
-0) Scope / Non-Goals
+## 0) Scope / Non-Goals
+
 Scope (v0.2)
 
 - Один детерминированный ритм для: Emulator → Proto (PCB) → FPGA → ASIC.
@@ -32,7 +34,7 @@ Non-Goals (v0.2)
 
 ---
 
-1) Термины
+## 1) Термины
 
 - **Conductor** — цифровой дирижёр (CPU), готовит вход, дергает EV_FLASH, делает bake/reset.
 - **Island/Swarm** — сеть тайлов + общая шина BUS16 (8 lane) поверх VSB.
@@ -49,7 +51,7 @@ Non-Goals (v0.2)
 
 ---
 
-2) Hard Constants (заморозка v0.2)
+## 2) Hard Constants (заморозка v0.2)
 
 - VSB: 8 линий данных VSB[0..7], каждая несёт Level16.
 - BUS16: 8 lane, суммирование вкладов в WRITE.
@@ -63,18 +65,21 @@ Non-Goals (v0.2)
 
 ---
 
-3) Плоскости интерфейса
-3.1 Data Plane: VSB[0..7]
+## 3) Плоскости интерфейса
+
+### 3.1 Data Plane: VSB[0..7]
+
 Каждая линия несёт Level16; данные от предыдущего тика доступны только через граф активации (BUS_R), не через арифметическое суммирование
 
-3.2 Rhythm Plane: READ/WRITE (двухфазный предохранитель)
+### 3.2 Rhythm Plane: READ/WRITE (двухфазный предохранитель)
 
 - READ: все тайлы семплируют вход и обновляют state.
 - WRITE: тайлы выставляют выходы в BUS16.
 - Между ними обязателен turnaround (зазор направления), чтобы Conductor отпустил VSB и Island мог её драйвить.
 - Conductor читает BUS16 только после завершения WRITE.
 
-3.3 Config Plane: CFG (SPI-like)
+### 3.3 Config Plane: CFG (SPI-like)
+
 CFG_CS, CFG_SCLK, CFG_MOSI, CFG_MISO
 
 Через CFG:
@@ -86,18 +91,21 @@ CFG_CS, CFG_SCLK, CFG_MOSI, CFG_MISO
 
 ---
 
-4) Event Protocol / SHM ABI
-4.1 Внешние события (API)
+## 4) Event Protocol / SHM ABI
+
+### 4.1 Внешние события (API)
 
 - **EV_FLASH(tag_u32)**
 
     - выполняет один детерминированный цикл READ→WRITE
     - возвращает readout (R0/R1), FLAGS читаются отдельно (CFG) или в return struct
     - разрешён только если BAKE_APPLIED==1, иначе NotBaked (состояние не меняется)
+
 - **EV_RESET_DOMAIN(mask16)**
 
     - только между EV_FLASH
     - только если BAKE_APPLIED==1, иначе NotBaked
+
 - **EV_BAKE()**
 
     - только между EV_FLASH
@@ -105,7 +113,7 @@ CFG_CS, CFG_SCLK, CFG_MOSI, CFG_MISO
     - при успехе делает reset runtime (см. 6.3)
     - при ошибке ничего не меняет
 
-4.2 Внутренние подфазы EV_FLASH (не внешний API)
+### 4.2 Внутренние подфазы EV_FLASH (не внешний API)
 
 1. PHASE_READ
 2. TURNAROUND
@@ -113,13 +121,15 @@ CFG_CS, CFG_SCLK, CFG_MOSI, CFG_MISO
 4. READOUT_SAMPLE
 5. INTERPHASE_AUTORESET (опционально, по разделу 15)
 
-4.3 Readout timing
+### 4.3 Readout timing
+
 Default R0_RAW_BUS:
 
 - Conductor читает BUS16[0..7] сразу после завершения PHASE_WRITE этого же EV_FLASH.
 - В SHM: EV_FLASH заполняет OUT_buf, Conductor читает после возврата.
 
-4.4 Bake Transaction / CFG staging
+### 4.4 Bake Transaction / CFG staging
+
 Staging buffer в Digital Island. EV_BAKE применяет параметры в fabric.
 
 Ошибки EV_BAKE (минимум):
@@ -128,13 +138,15 @@ OK, BakeBadMagic, BakeBadVersion, BakeBadLen, BakeMissingTLV, BakeBadTLVLen, Bak
 
 ---
 
-5) Канонический Tick (одна “вспышка”)
-5.1 Setup (Conductor)
+## 5) Канонический Tick (одна “вспышка”)
+
+### 5.1 Setup (Conductor)
 
 - Conductor выставляет VSB_INGRESS16[0..7] (Level16).
 - Держит стабильным до конца апертуры READ.
 
-5.2 PHASE_READ (Island)
+### 5.2 PHASE_READ (Island)
+
 В начале READ:
 
 - фиксируем locked_before[t] = locked[t] для всех тайлов
@@ -148,29 +160,29 @@ OK, BakeBadMagic, BakeBadVersion, BakeBadLen, BakeMissingTLV, BakeBadTLVLen, Bak
 - если locked_before==1: тайл остаётся locked, матрица/decay не применяются
 - выбираем drive_vec (6.8)
 
-5.3 TURNAROUND
+### 5.3 TURNAROUND
 
 - Conductor снимает драйв VSB (Hi-Z / no-drive).
 - Island включает драйв только в WRITE.
 
-5.4 PHASE_WRITE (Island)
+### 5.4 PHASE_WRITE (Island)
 
 - Тайл пишет в BUS16 только если BUS_W==1 и (locked self или есть locked-предок).
 - Пишется **весь** drive_vec[0..7] (все 8 lane), дальше “честное суммирование” (раздел 13).
 
-5.5 READOUT_SAMPLE (Conductor)
+### 5.5 READOUT_SAMPLE (Conductor)
 
 - R0_RAW_BUS: readout = BUS16[0..7] как 8×Level16.
 
-5.6 INTERPHASE_AUTORESET (опционально)
+### 5.6 INTERPHASE_AUTORESET (опционально)
 
 - после фиксации readout и FLAGS32_LAST применяем AutoReset-by-Fire (раздел 15).
 
 ---
 
-6) Tile Model v0.2
-1. 
-6.1 ACTIVE + вход тайла (эстафета + мгновенный схлоп ветки)
+## 6) Tile Model v0.2
+
+### 6.1 ACTIVE + вход тайла (эстафета + мгновенный схлоп ветки)
 
 Routing edges: направления N/E/S/W/NE/SE/SW/NW формируют ребро A→B если у A стоит флаг и сосед B существует (см. 8).
 
@@ -184,25 +196,32 @@ Propagate: `ACTIVE[t]=1` если существует `p∈Parents(t)` тако
 Вход тайла и принудительный ноль:
 
 Если `ACTIVE[t]==0`, то тайл считается «мёртвым участком»:
+
 `thr_cur16 := 0`
 `locked := 0`
 `drive_vec := {0..0}`
+
 веса/row/decay не применяются в этом tick
 
 Если `ACTIVE[t]==1`, то тайл читает только VSB_INGRESS16 (все 8 lane):
+
 ```
 for i in 0..7:
   in16[t][i] = clamp15(VSB_INGRESS16[i])
   IN_CLIP[t][i] = (VSB_INGRESS16[i] > 15)
 ```
+
 Важно: Шина BUS16 отражает состояние, сформированное в предыдущем EV_FLASH, и не суммируется с VSB в текущем тике. Единственная роль BUS16 в фазе READ — семантическая: тайлы с флагом BUS_R становятся источниками графа активации (ACTIVE seed). Данные из шины не участвуют в вычислении in16.
+
 Эстафета: Сигнал распространяется от предка к потомку за 2 тика:
-тик N: предок фьюзится → драйвит шину в PHASE_WRITE
-тик N+1: потомок активируется через BUS_R → читает VSB_INGRESS → вычисляется
+
+- тик N: предок фьюзится → драйвит шину в PHASE_WRITE
+- тик N+1: потомок активируется через BUS_R → читает VSB_INGRESS → вычисляется
 
 ---
 
-6.2 Baked state тайла (v0.2)
+### 6.2 Baked state тайла (v0.2)
+
 Baked:
 
 - thr_lo16 (i16)
@@ -236,7 +255,8 @@ EV_RESET_DOMAIN(mask16) применяется только между EV_FLASH.
 
 ---
 
-6.4 Канонические функции (SignedWeight5)
+### 6.4 Канонические функции (SignedWeight5)
+
 Вес: mag3∈[0..7], sign1∈{0,1} (1="+", 0="−").
 
 Каноническое signed-умножение (без деления):
@@ -249,7 +269,7 @@ clamp15(x)=clamp_range(x,0,15).
 
 ---
 
-6.5 RowOut pipeline в PHASE_READ (для ACTIVE && !locked_before)
+### 6.5 RowOut pipeline в PHASE_READ (для ACTIVE && !locked_before)
 
 **Два независимых вычисления:**
 
@@ -270,6 +290,7 @@ row16_out[r] = clamp15( (max(in16[r] * weight_sum[r], 0) + 28) / 56 ) → 0..15
 ```
 
 **Нормализация для шины:**
+
 - weight_sum = +56 (все веса +7) → 100% пропуск (row16_out = in16[r])
 - weight_sum = +28 (половина весов) → ~50% пропуск (row16_out ≈ in16[r] / 2)
 - weight_sum = 0 или отрицательная → 0% (тишина)
@@ -282,7 +303,8 @@ row16_signed[r] = row_raw_signed[r] → [-840..+840]
 
 ---
 
-6.6 Аккумулятор + decay-to-zero + fuse-by-range
+### 6.6 Аккумулятор + decay-to-zero + fuse-by-range
+
 locked_before = locked (снимок в начале READ).
 
 Правила применяются **только если ACTIVE==1**.
@@ -343,7 +365,8 @@ locked_after = in_range ? 1 : 0
 
 ---
 
-6.7 FUSE-LOCK (обязательный)
+### 6.7 FUSE-LOCK (обязательный)
+
 Если locked_after==1, тайл сохраняет состояние:
 
 - thr_cur сохраняется (с учётом decay),
@@ -352,7 +375,8 @@ locked_after = in_range ? 1 : 0
 
 ---
 
-6.8 Drive selection (WRITE)
+### 6.8 Drive selection (WRITE)
+
 В конце READ для каждого тайла вычисляются два значения (раздел 6.5):
 
 ```
@@ -375,7 +399,8 @@ row16_out[r] = clamp15((max(in16[r] * weight_sum[r], 0) + 28) / 56)
 
 ---
 
-7) RoutingFlags16: карта битов
+## 7) RoutingFlags16: карта битов
+
 LSB-first:
 
 - bit0  N
@@ -392,8 +417,10 @@ LSB-first:
 
 ---
 
-8) Граф активации (соседи) и координаты
-8.1 Соседи по топологии
+## 8) Граф активации (соседи) и координаты
+
+### 8.1 Соседи по топологии
+
 tile_id = y*tile_w + x
 
 Кардинальные:
@@ -410,7 +437,8 @@ tile_id = y*tile_w + x
 - SW(x,y)=(x-1,y+1) если x>0 и y<tile_h-1
 - NW(x,y)=(x-1,y-1) если x>0 и y>0
 
-8.2 Рёбра активации
+### 8.2 Рёбра активации
+
 Если у тайла A установлен флаг Dir и сосед B=neighbor(A,Dir) существует → ребро A→B.
 
 Это влияет **только** на вычисление ACTIVE (6.1). Данные не передаются.
@@ -419,7 +447,8 @@ tile_id = y*tile_w + x
 
 ---
 
-9) BUS Semantics: честное суммирование + CLIP/OVF
+## 9) BUS Semantics: честное суммирование + CLIP/OVF
+
 В PHASE_WRITE для каждой линии i=0..7:
 
 ```
@@ -442,7 +471,8 @@ OVF:
 
 ---
 
-10) COLLIDE: домены и winner (как v0.1, но без DAG-зависимостей)
+## 10) COLLIDE: домены и winner (как v0.1, но без DAG-зависимостей)
+
 Определения в текущем tick:
 
 - FIRE(t) = (locked_before[t]==0 && locked_after[t]==1)
@@ -462,7 +492,8 @@ winner(d) = argmax_{t∈FIRED_SET(d)} (priority8(t), -tile_id(t))
 
 ---
 
-11) AutoReset-by-Fire (межфазный доменный сброс) — v0.2
+## 11) AutoReset-by-Fire (межфазный доменный сброс) — v0.2
+
 (опционально; если не нужно — можно выкинуть целиком)
 
 Каждый тайл имеет baked reset_on_fire_mask16[t].
@@ -484,21 +515,24 @@ apply_reset_domain(AUTO_RESET_MASK16)
 
 ---
 
-12) READOUT_POLICY v0.2
+## 12) READOUT_POLICY v0.2
+
 Default: R0_RAW_BUS — readout = BUS16[0..7] после WRITE.
 
 Опционально R1_DOMAIN_WINNER_ID32 возможно, но требует дисциплины “только winner драйвит ID”, иначе сумма разрушит ID. (Если нужно — добавим точный канон, сейчас не критично.)
 
 ---
 
-13) Bake Binary TLV Spec v0.2 (несовместим с v0.1)
-13.1 Общие правила
+## 13) Bake Binary TLV Spec v0.2 (несовместим с v0.1)
+
+### 13.1 Общие правила
 
 - Little-endian.
 - TLV padding = 0, выравнивание value до 4-байт boundary.
 - CRC32 IEEE (zlib/crc32) по всем байтам blob от offset 0 до начала TLV_CRC32 (TLV_CRC32 header+value в CRC не входят).
 
-13.2 Header (28 bytes)
+### 13.2 Header (28 bytes)
+
 BakeBlobHeader:
 
 - magic char[4] = "D8BK"
@@ -520,7 +554,7 @@ bit 0: BAKE_FLAG_DOUBLE_STRAIT
    - Используется для повышения селективности при малом расстоянии Хэмминга
 bits 1-31: reserved (должны быть 0)
 
-13.3 TLV header (8 bytes)
+### 13.3 TLV header (8 bytes)
 
 - type u16
 - tflags u16
@@ -528,7 +562,7 @@ bits 1-31: reserved (должны быть 0)
 
 - value[len] + padding
 
-13.4 TLV type map v0.2
+### 13.4 TLV type map v0.2
 
 - TLV_TOPOLOGY (0x0100)
 - TLV_TILE_PARAMS_V2 (0x0121)
@@ -539,13 +573,16 @@ bits 1-31: reserved (должны быть 0)
 - TLV_TILE_FIELD_LIMIT (0x0170)
 - TLV_CRC32 (0xFFFE) — последний
 
-13.5 Обязательные TLV
+### 13.5 Обязательные TLV
+
 Все из списка выше обязательны, кроме того, что AutoReset можно сделать нулевыми масками.
 
 ---
 
-14) TLV структуры (канон v0.2)
-14.1 TLV_TOPOLOGY (0x0100), len=16
+## 14) TLV структуры (канон v0.2)
+
+### 14.1 TLV_TOPOLOGY (0x0100), len=16
+
 TopologyV0:
 
 - tile_count u32
@@ -556,7 +593,8 @@ TopologyV0:
 - reserved u16 (=0)
 - reserved2 u32 (=0)
 
-14.2 TLV_TILE_PARAMS_V2 (0x0121), len = tile_count * 13
+### 14.2 TLV_TILE_PARAMS_V2 (0x0121), len = tile_count * 13
+
 TileParamsV2 (13 bytes per tile):
 
 - thr_lo16   i16 (bytes 0-1)
@@ -568,23 +606,27 @@ TileParamsV2 (13 bytes per tile):
 - flags8     u8  (=0 reserved) (byte 10)
 - reserved   u16 (=0) (bytes 11-12)
 
-14.3 TLV_TILE_ROUTING_FLAGS16 (0x0131), len = tile_count * 2
+### 14.3 TLV_TILE_ROUTING_FLAGS16 (0x0131), len = tile_count * 2
+
 Per tile:
 
 - routing_flags16 u16 (LE)
 
 Reserved bits 10..15 должны быть 0.
 
-14.4 TLV_TILE_WEIGHTS_PACKED (0x0160), len = tile_count * 40
+### 14.4 TLV_TILE_WEIGHTS_PACKED (0x0160), len = tile_count * 40
+
 Как раньше:
 
 - 32 bytes: magnitudes Wmag[8][8] (64 × mag3∈[0..7], 4 бита каждый, старший бит=0)
 - 8 bytes: sign bits Wsign[8][8] (64 бита), LSB-first
 
-14.5 TLV_RESET_ON_FIRE_MASK16 (0x0150), len = tile_count * 2
+### 14.5 TLV_RESET_ON_FIRE_MASK16 (0x0150), len = tile_count * 2
+
 Per tile: reset_mask16 u16
 
-14.6 TLV_READOUT_POLICY (0x0140), len=12
+### 14.6 TLV_READOUT_POLICY (0x0140), len=12
+
 ReadoutPolicyV0:
 
 - mode u8 (0=R0_RAW_BUS, 1=R1_DOMAIN_WINNER_ID32)
@@ -594,17 +636,18 @@ ReadoutPolicyV0:
 - reserved1 u16 (=0)
 - reserved2 u32 (=0)
 
-14.7 TLV_CRC32 (0xFFFE), len=4
+### 14.7 TLV_CRC32 (0xFFFE), len=4
 
 - crc32 u32
 
-14.8 TLV_TILE_FIELD_LIMIT (0x0170), len=4
+### 14.8 TLV_TILE_FIELD_LIMIT (0x0170), len=4
 
 - tile_field_limit u32 (0 = full kTileCount)
 
 ---
 
-15) Load-time validation (обязательное)
+## 15) Load-time validation (обязательное)
+
 Загрузчик bake обязан:
 
 1. magic/ver/total_len
@@ -615,6 +658,7 @@ ReadoutPolicyV0:
     - TILE_ROUTING_FLAGS16: tile_count*2
     - TILE_WEIGHTS_PACKED: tile_count*40
     - RESET_ON_FIRE_MASK16: tile_count*2
+
 4. CRC32 по правилу “до TLV_CRC32”
 5. reserved-поля = 0; flags8==0; routing reserved bits 10..15 == 0
    header.flags может содержать только BAKE_FLAG_DOUBLE_STRAIT
@@ -623,7 +667,8 @@ ReadoutPolicyV0:
 
 ---
 
-16) Runtime FLAGS (минимум)
+## 16) Runtime FLAGS (минимум)
+
 Island отдаёт FLAGS32 (минимум):
 
 - bit0 READY_LAST
@@ -634,7 +679,7 @@ Island отдаёт FLAGS32 (минимум):
 
 ---
 
-18) UDP Protocol (packet_v1, fixed binary)
+## 17) UDP Protocol (packet_v1, fixed binary)
 
 Назначение: каскадирование машин. Пакеты одинаковые для IN и OUT.
 
@@ -665,7 +710,7 @@ Island отдаёт FLAGS32 (минимум):
 
 ---
 
-19) Cascade Configuration (каскад машин)
+## 18) Cascade Configuration (каскад машин)
 
 **Назначение:** объединение нескольких машин Decima-8 в каскад для обработки одного VSB потока.
 
@@ -708,7 +753,6 @@ Island отдаёт FLAGS32 (минимум):
 
 **Важно:**
 
-- Все машины в каскаде должны иметь **одинаковый bake** (личность).
 - **reset_mask16** передаётся по каскаду для синхронизации сброса доменов.
 - **bus16** на шине — это результат суммирования вкладов всех locked тайлов с BUS_W.
 - Каждая машина добавляет свои решения в SolutionsPanel независимо.
@@ -724,6 +768,7 @@ net_solver -r 9903 -s 9904 -h 192.168.1.102 -R -v bake.d8p
 ```
 
 **Параметры:**
+
 - `-r <port>` — порт для приёма UDP (UDP IN)
 - `-s <port>` — порт для отправки UDP (UDP OUT)
 - `-h <host>` — IP адрес следующей машины в каскаде
@@ -733,7 +778,7 @@ net_solver -r 9903 -s 9904 -h 192.168.1.102 -R -v bake.d8p
 
 ---
 
-17) MUST для эмулятора (чтобы железо совпало)
+## 19) MUST для эмулятора (чтобы железо совпало)
 
 1. EV_FLASH всегда выполняет READ→WRITE, двойная буферизация (нельзя читать то, что пишешь).
 2. EV_RESET_DOMAIN и EV_BAKE только между EV_FLASH.
